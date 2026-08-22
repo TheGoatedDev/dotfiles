@@ -1,9 +1,14 @@
-# ~/.zshenv — all zsh shells. Pure env only. Managed by dotfiles.
+# zshenv — all zsh shells. Pure env only. Managed by dotfiles.
 
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv zsh)"
+fi
 
-export NVM_DIR="$HOME/.nvm"
-export PNPM_HOME="$HOME/Library/pnpm"
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+# macOS pnpm default; override in .zshenv.local if needed
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
 
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;

@@ -1,4 +1,4 @@
-# Copy to ~/.gitconfig.local (not tracked)
+# Copy to $HOME/.gitconfig.local (not tracked)
 [user]
 	name = Your Name
 	email = you@example.com

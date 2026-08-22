@@ -7,20 +7,20 @@ Public, idempotent macOS setup: shell configs (Stow), Homebrew (`Brewfile`), Ope
 ## Quick start
 
 ```bash
-git clone https://github.com/<you>/dotfiles.git ~/Projects/Personal/Dotfiles
-cd ~/Projects/Personal/Dotfiles
+git clone https://github.com/<you>/dotfiles.git
+cd dotfiles
 ./install --force   # first cutover from existing home files
 ```
 
 Then:
 
 ```bash
-mkdir -p ~/.config/secrets
-cp env.example ~/.config/secrets/env && chmod 600 ~/.config/secrets/env
+mkdir -p "$HOME/.config/secrets"
+cp env.example "$HOME/.config/secrets/env" && chmod 600 "$HOME/.config/secrets/env"
 # edit secrets
 
-cp gitconfig.local.example ~/.gitconfig.local   # name / email / signing key
-cp zshenv.local.example ~/.zshenv.local         # kube, bitwarden sock, etc.
+cp gitconfig.local.example "$HOME/.gitconfig.local"   # name / email / signing key
+cp zshenv.local.example "$HOME/.zshenv.local"         # machine-only env if needed
 ```
 
 Open a new shell.
