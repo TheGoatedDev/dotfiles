@@ -269,8 +269,8 @@ opencode_pnpm() {
   [[ -f "$OPENCODE_DIR/package.json" ]] || return 0
   if command -v pnpm >/dev/null 2>&1; then
     log "pnpm install (opencode config)"
-    # ignored native build scripts can exit non-zero even when deps are fine
-    (cd "$OPENCODE_DIR" && pnpm install --ignore-scripts) || warn "pnpm install had issues (continuing)"
+    # optional native builds (msgpackr-extract) may warn; never fail install
+    (cd "$OPENCODE_DIR" && pnpm install --ignore-scripts >/dev/null) || true
     repair_opencode_stow
   else
     warn "pnpm not found; skip opencode plugin install"
@@ -312,9 +312,11 @@ link_custom_skills
 relink_opencode_skills
 
 log "done"
-print -r -- ""
-print -r -- "Next (if first machine):"
-print -r -- "  cp $REPO/env.example ~/.config/secrets/env && chmod 600 ~/.config/secrets/env"
-print -r -- "  cp $REPO/gitconfig.local.example ~/.gitconfig.local   # edit name/email"
-print -r -- "  cp $REPO/zshenv.local.example ~/.zshenv.local         # kube/ssh if needed"
-print -r -- "  open a new shell"
+if [[ ! -f "$SECRETS_PATH" || ! -f "$HOME_DIR/.gitconfig.local" ]]; then
+  print -r -- ""
+  print -r -- "Next (first machine):"
+  [[ -f "$SECRETS_PATH" ]] || print -r -- "  cp $REPO/env.example ~/.config/secrets/env && chmod 600 ~/.config/secrets/env"
+  [[ -f "$HOME_DIR/.gitconfig.local" ]] || print -r -- "  cp $REPO/gitconfig.local.example ~/.gitconfig.local   # edit name/email"
+  [[ -f "$HOME_DIR/.zshenv.local" ]] || print -r -- "  cp $REPO/zshenv.local.example ~/.zshenv.local         # kube/ssh if needed"
+  print -r -- "  open a new shell"
+fi
