@@ -242,11 +242,36 @@ relink_opencode_skills() {
   log "opencode skills linked ($(ls -1 "$OPENCODE_SKILLS_DIR" | wc -l | tr -d ' '))"
 }
 
+# pnpm/plugin install can replace stowed files with plain files — package wins
+repair_opencode_stow() {
+  local pkg_dir="$REPO/opencode"
+  [[ -d "$pkg_dir" ]] || return 0
+  log "repair opencode stow"
+  local f rel dest
+  while IFS= read -r -d '' f; do
+    rel="${f#$pkg_dir/}"
+    dest="$HOME_DIR/$rel"
+    [[ -e "$dest" || -L "$dest" ]] || continue
+    if is_repo_link "$dest"; then
+      continue
+    fi
+    if [[ -L "$dest" ]]; then
+      local abs="${dest:A}"
+      [[ "$abs" == "$REPO"/* || "$abs" == "$f" ]] && continue
+    fi
+    log "remove stomped $dest"
+    rm -rf "$dest"
+  done < <(find "$pkg_dir" -type f -print0)
+  stow -d "$REPO" -t "$HOME_DIR" -R opencode
+}
+
 opencode_pnpm() {
   [[ -f "$OPENCODE_DIR/package.json" ]] || return 0
   if command -v pnpm >/dev/null 2>&1; then
     log "pnpm install (opencode config)"
-    (cd "$OPENCODE_DIR" && pnpm install)
+    # ignored native build scripts can exit non-zero even when deps are fine
+    (cd "$OPENCODE_DIR" && pnpm install --ignore-scripts) || warn "pnpm install had issues (continuing)"
+    repair_opencode_stow
   else
     warn "pnpm not found; skip opencode plugin install"
   fi

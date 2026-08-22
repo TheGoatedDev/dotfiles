@@ -38,7 +38,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `zsh` | `~/.zshenv`, `~/.zshrc` |
 | `git` | `~/.gitconfig`, `~/.config/git/ignore` |
 | `ghostty` | `~/.config/ghostty/config` |
-| `opencode` | `~/.config/opencode/*` (json, AGENTS.md, plugins, package.json) |
+| `opencode` | `~/.config/opencode/*` (json, AGENTS.md, plugins, package.json). No stowed `.gitignore` — pnpm may write lockfiles/local ignores under that dir. |
 
 OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencode/skills/*` → `~/.agents/skills/*`.
 
