@@ -8,6 +8,73 @@ Default to:
 - GitHub PR and CI workflows
 - repo-wide codebase analysis
 
+# Skills
+
+Load the matching skill when the task fits. Skills live under `~/.agents/skills` (linked into OpenCode).
+
+## Process
+
+- `caveman` — terse compressed communication
+- `grill-me` — relentless design interview until decisions lock
+- `grill-with-docs` — same, while writing ADRs/glossary
+- `handoff` — compact session for another agent
+- `diagnose` — reproduce → minimise → hypothesise → instrument → fix
+- `improve-codebase-architecture` — deepening opportunities + HTML report
+- `thermo-nuclear-code-quality-review` — harsh maintainability review
+- `tropes-fyi` — human prose; avoid AI-writing tells
+- `daily-work-summary` — GitHub activity → manager update (ask why per item)
+
+## Docs
+
+- `find-docs` — current library/API docs via `ctx7` CLI (prefer over training data)
+
+## Browser / web
+
+- `agent-browser` — browser automation (pages, forms, screenshots)
+- `web-perf` — Core Web Vitals / perf audit
+- `seo-audit` — technical / on-page SEO diagnosis
+
+## Cloudflare
+
+- `cloudflare` — platform umbrella (Workers, KV, D1, R2, AI, …)
+- `wrangler` — Workers CLI deploy/dev/config
+- `workers-best-practices` — production Workers patterns
+- `durable-objects` — DO state, alarms, WS, SQLite
+- `agents-sdk` — Cloudflare Agents SDK
+- `turnstile-spin` — Turnstile end-to-end setup
+- `cloudflare-email-service` — Email Sending + Routing
+- `cloudflare-one` — Zero Trust / SASE
+- `cloudflare-one-migrations` — migrate to Cloudflare One
+- `sandbox-stable` — Sandbox SDK stable
+- `sandbox-next` — Sandbox SDK `@next` / 1.0 preview
+- `sandbox-migrate-to-next` — port stable → `@next`
+
+# CLI tools
+
+Prefer these over reinventing. Do not reach for tools not listed here unless the user asks.
+
+| CLI | Use |
+|-----|-----|
+| `opencode` | this agent |
+| `ctx7` | library docs: `ctx7 library <name> "q"` then `ctx7 docs <id> "q"` |
+| `agent-browser` | browser automation (`skills get core --full` first use in session) |
+| `gh` | GitHub PRs, issues, checks, releases |
+| `git` | version control |
+| `wrangler` | Cloudflare Workers / bindings / deploy |
+| `pulumi` | infrastructure as code |
+| `docker` | containers |
+| `bun` / `pnpm` / `npm` / `node` | JS tooling (prefer project package manager) |
+| `go` | Go toolchain |
+| `uv` / `uvx` / `pipx` | Python tools |
+| `rtk` | terminal helper when available |
+| `ffmpeg` | media convert/probe |
+| `act` | run GitHub Actions locally |
+| `stow` | only when changing Dotfiles layout |
+
+# MCP
+
+Also available as MCP tools (not CLI): **exa** (web search), **linear**, **posthog**.
+
 # Commits
 
 When a feature or unit of work is complete and coherent on its own, make an atomic commit immediately — one logical change per commit. Do not batch unrelated finished units. Do not wait to be asked.
@@ -25,12 +92,16 @@ When a feature or unit of work is complete and coherent on its own, make an atom
 
 # Browser
 
-Use `agent-browser`. Run `agent-browser skills get core --full` before first use in a session.
+Use `agent-browser` for browser automation. Run `agent-browser skills get core --full` before first use in a session.
 
 1. `agent-browser open <url>`
 2. `agent-browser snapshot -i`
 3. click/fill via refs like `@e1`
 4. re-snapshot after page changes
+
+# Machine setup
+
+Dotfiles: `~/Projects/Personal/Dotfiles`. Apply with `./install`. Do not hand-edit stowed targets under `$HOME` — edit the package in the repo.
 
 <!-- context7 -->
 Use the `ctx7` CLI to fetch current documentation whenever the user asks about a library, framework, SDK, API, CLI tool, or cloud service — even well-known ones like React, Next.js, Prisma, Express, Tailwind, Django, or Spring Boot. This includes API syntax, configuration, version migration, library-specific debugging, setup instructions, and CLI tool usage. Use even when you think you know the answer — your training data may not reflect recent changes. Prefer this over web search for library docs.
@@ -39,14 +110,12 @@ Do not use for: refactoring, writing scripts from scratch, debugging business lo
 
 ## Steps
 
-1. Resolve library: `npx ctx7@latest library <name> "<what to look up>"` — use the official library name with proper punctuation (e.g., "Next.js" not "nextjs", "Customer.io" not "customerio", "Three.js" not "threejs")
-2. Pick the best match (ID format: `/org/project`) by: exact name match, description relevance, code snippet count, source reputation (High/Medium preferred), and benchmark score (higher is better). If results don't look right, try alternate names or queries (e.g., "next.js" not "nextjs", or rephrase the question)
-3. Fetch docs: `npx ctx7@latest docs <libraryId> "<what to look up>"` — run a separate `docs` command per distinct concept if the question spans multiple topics, unless it's about how they interact
-4. Answer using the fetched documentation
+1. Resolve library: `ctx7 library <name> "<what to look up>"` — official names with proper punctuation (e.g. "Next.js" not "nextjs")
+2. Pick best match (ID `/org/project`) by name, description, snippet count, reputation, benchmark score
+3. Fetch docs: `ctx7 docs <libraryId> "<what to look up>"` — one concept per call unless topics interact
+4. Answer from fetched docs
 
-You MUST call `library` first to get a valid ID unless the user provides one directly in `/org/project` format. Be specific about what to look up in the library's documentation — specific and detailed queries return better results than vague single words, but keep each query to a single concept unless the question is about how concepts interact; combined multi-topic queries dilute ranking and return shallow results for each topic. Do not run more than 3 commands per question. Do not include sensitive information (API keys, passwords, credentials) in queries.
+Call `library` first unless the user gives `/org/project`. Max 3 ctx7 commands per question. No secrets in queries. Version pins: `/org/project/version` when listed.
 
-For version-specific docs, use `/org/project/version` from the `library` output (e.g., `/vercel/next.js/v14.3.0`).
-
-If a command fails with a quota error, inform the user and suggest `npx ctx7@latest login` or setting `CONTEXT7_API_KEY` env var for higher limits. Do not silently fall back to training data.
+If quota errors: tell the user to `ctx7 login` or set `CONTEXT7_API_KEY`. Do not silently fall back to training data.
 <!-- context7 -->
