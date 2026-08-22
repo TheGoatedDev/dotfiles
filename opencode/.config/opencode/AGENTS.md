@@ -22,7 +22,6 @@ Load the matching skill when the task fits. Skills live under `~/.agents/skills`
 - `improve-codebase-architecture` — deepening opportunities + HTML report
 - `thermo-nuclear-code-quality-review` — harsh maintainability review
 - `tropes-fyi` — human prose; avoid AI-writing tells
-- `daily-work-summary` — GitHub activity → manager update (ask why per item)
 
 ## Docs
 
