@@ -14,7 +14,7 @@ Load the matching skill when the task fits. Skills live under `~/.agents/skills`
 
 ## Process
 
-- `caveman` — terse compressed communication
+- `caveman` — terse compressed communication (also always-on via `opencode-caveman` plugin; `/caveman lite|full|ultra|off`)
 - `grill-me` — relentless design interview until decisions lock
 - `grill-with-docs` — same, while writing ADRs/glossary
 - `handoff` — compact session for another agent
