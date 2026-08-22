@@ -14,8 +14,9 @@ usage() {
 Usage: ./install [options]
 
   --force          Backup conflicting files, then stow
-  --reinstall      brew reinstall every formula/cask in the Brewfile
-                   (then normal install). Heavy; use when packages are broken.
+  --reinstall      brew reinstall Brewfile formulae (and casks if a real TTY).
+                   Casks need admin; primes sudo with a hidden password prompt.
+                   Heavy; use when packages are broken.
   --check          Report drift only (no changes)
   --skills-only    Skills + opencode skill links only
   --strict         Fail if secrets file missing
@@ -70,27 +71,65 @@ ensure_brew() {
   eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 }
 
+brew_reinstall_from_file() {
+  [[ -f "$BREWFILE" ]] || die "Missing Brewfile"
+  local line name
+  local has_tty=0
+  # Need a real terminal for admin password (casks). Piped/agent stdin = broken echo.
+  [[ -t 0 && -t 1 && -t 2 ]] && has_tty=1
+
+  log "brew reinstall (Brewfile formulae)"
+  while IFS= read -r line; do
+    [[ "$line" == brew\ \"* ]] || continue
+    name="${line#brew \"}"
+    name="${name%%\"*}"
+    [[ -n "$name" ]] || continue
+    log "reinstall formula $name"
+    brew reinstall "$name" || warn "reinstall failed: $name"
+  done < "$BREWFILE"
+
+  if (( ! has_tty )); then
+    warn "no TTY — skipping cask reinstall (would prompt for password unsafely)"
+    warn "run in Terminal: ./install --reinstall"
+    return 0
+  fi
+
+  # Secure password prompt once; brew casks reuse the sudo ticket
+  log "admin password (hidden) for cask reinstalls…"
+  if ! sudo -v; then
+    warn "sudo failed — skipping cask reinstalls"
+    return 0
+  fi
+  # keep sudo alive while casks run
+  local sudo_keeper=0
+  (
+    while true; do
+      sudo -n true 2>/dev/null || exit 0
+      sleep 30
+    done
+  ) &
+  sudo_keeper=$!
+  trap "kill $sudo_keeper 2>/dev/null || true" EXIT INT TERM
+
+  log "brew reinstall (Brewfile casks)"
+  while IFS= read -r line; do
+    [[ "$line" == cask\ \"* ]] || continue
+    name="${line#cask \"}"
+    name="${name%%\"*}"
+    [[ -n "$name" ]] || continue
+    log "reinstall cask $name"
+    brew reinstall --cask "$name" || warn "reinstall failed: $name"
+    sudo -v 2>/dev/null || true
+  done < "$BREWFILE"
+
+  kill $sudo_keeper 2>/dev/null || true
+  trap - EXIT INT TERM
+}
+
 brew_bundle() {
   [[ -f "$BREWFILE" ]] || die "Missing Brewfile"
   if (( BREW_REINSTALL )); then
-    log "brew reinstall (Brewfile formulae + casks)"
-    local line name
-    while IFS= read -r line; do
-      [[ "$line" == brew\ \"* ]] || continue
-      name="${line#brew \"}"
-      name="${name%%\"*}"
-      [[ -n "$name" ]] || continue
-      log "reinstall formula $name"
-      brew reinstall "$name" || warn "reinstall failed: $name"
-    done < "$BREWFILE"
-    while IFS= read -r line; do
-      [[ "$line" == cask\ \"* ]] || continue
-      name="${line#cask \"}"
-      name="${name%%\"*}"
-      [[ -n "$name" ]] || continue
-      log "reinstall cask $name"
-      brew reinstall --cask "$name" || warn "reinstall failed: $name"
-    done < "$BREWFILE"
+    brew_reinstall_from_file
   fi
   log "brew bundle (no upgrade)"
   # Idempotent install only — don't pull multi‑GB cask upgrades mid-bootstrap
