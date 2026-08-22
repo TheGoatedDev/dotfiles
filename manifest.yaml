@@ -23,6 +23,7 @@ skills:
     JuliusBrussee/caveman:
       - caveman
     mattpocock/skills:
+      - grill-me
       - grill-with-docs
     vercel-labs/agent-browser:
       - agent-browser
