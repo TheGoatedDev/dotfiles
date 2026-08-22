@@ -29,9 +29,8 @@ Open a new shell.
 
 | Path | Role |
 |------|------|
-| `manifest.yaml` | Stow packages + skills paths (docs for humans + install defaults) |
+| `manifest.yaml` | Stow packages + external `skills.sh` packages |
 | `Brewfile` | Canonical Homebrew formulae/casks |
-| `skills-lock.json` | External skills pins for `skills.sh` |
 | `skills/custom/` | Your skills (symlinked into `~/.agents/skills`) |
 | `zsh/`, `git/`, `ghostty/`, `opencode/` | Stow packages → `$HOME` |
 | `install` | Idempotent apply (zsh) |
@@ -52,11 +51,11 @@ Open a new shell.
 
 ## Skills
 
-- **External:** restore from `skills-lock.json` via `npx skills`.
+- **External:** list under `skills.packages` in `manifest.yaml`; `./install --skills-only` runs `npx skills add`.
 - **Custom:** edit under `skills/custom/<name>/`, re-run `./install --skills-only`.
 - OpenCode skills dir is fully relinked to `~/.agents/skills/*`.
 
-Third-party packs not in the lock (e.g. Cloudflare skill set) stay unmanaged until you `npx skills add …` and refresh the lock into this repo.
+Skills on disk but not in `manifest.yaml` stay unmanaged until you add them there.
 
 ## Secrets
 

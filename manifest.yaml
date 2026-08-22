@@ -14,10 +14,18 @@ zsh_plugins:
     - https://github.com/zsh-users/zsh-syntax-highlighting
 
 skills:
-  lockfile: skills-lock.json
+  agent: opencode
   custom_dir: skills/custom
   agents_dir: ~/.agents/skills
   opencode_skills_dir: ~/.config/opencode/skills
+  # skills.sh packages (source → skill names). Edit here; ./install --skills-only
+  packages:
+    JuliusBrussee/caveman:
+      - caveman
+    mattpocock/skills:
+      - grill-with-docs
+    vercel-labs/agent-browser:
+      - agent-browser
 
 brewfile: Brewfile
 

@@ -54,7 +54,7 @@ ZSH_PLUGIN_REPOS=(
   https://github.com/zsh-users/zsh-autosuggestions
   https://github.com/zsh-users/zsh-syntax-highlighting
 )
-SKILLS_LOCK="$REPO/skills-lock.json"
+MANIFEST="$REPO/manifest.yaml"
 CUSTOM_SKILLS_DIR="$REPO/skills/custom"
 AGENTS_SKILLS_DIR="$(expand_path ~/.agents/skills)"
 OPENCODE_SKILLS_DIR="$(expand_path ~/.config/opencode/skills)"
@@ -255,32 +255,71 @@ check_secrets() {
 }
 
 install_skills_external() {
-  [[ -f "$SKILLS_LOCK" ]] || { warn "no skills-lock.json"; return 0; }
+  [[ -f "$MANIFEST" ]] || { warn "no manifest.yaml"; return 0; }
   mkdir -p "$AGENTS_SKILLS_DIR" "$HOME_DIR/.agents"
-  cp "$SKILLS_LOCK" "$HOME_DIR/.agents/.skill-lock.json"
 
-  # OpenCode only. Skip if already present under ~/.agents/skills.
-  python3 - <<'PY' "$SKILLS_LOCK" "$AGENTS_SKILLS_DIR" || true
-import json, subprocess, sys
+  # packages: under skills: in manifest.yaml — source → list of skill names.
+  # Skip if already present. Agent: opencode only.
+  python3 - <<'PY' "$MANIFEST" "$AGENTS_SKILLS_DIR" || true
+import re, subprocess, sys
 from pathlib import Path
-lock = json.loads(Path(sys.argv[1]).read_text())
+
+text = Path(sys.argv[1]).read_text()
 agents = Path(sys.argv[2])
-# skill renames in upstream repos
-ALIASES = {"diagnose": "diagnosing-bugs"}
-for name, meta in lock.get("skills", {}).items():
-    skill = ALIASES.get(name, name)
-    if (agents / skill).exists() or (agents / name).exists():
-        print(f"→ skills skip (present): {skill}")
+
+# tiny indent walker for skills.packages only (no PyYAML)
+lines = text.splitlines()
+i = 0
+in_skills = in_packages = False
+skills_indent = packages_indent = None
+packages: dict[str, list[str]] = {}
+cur_src = None
+
+while i < len(lines):
+    raw = lines[i]
+    i += 1
+    if not raw.strip() or raw.lstrip().startswith("#"):
         continue
-    src = meta.get("source") or ""
-    if not src:
+    indent = len(raw) - len(raw.lstrip(" "))
+    s = raw.strip()
+    if not in_skills:
+        if s == "skills:" and indent == 0:
+            in_skills = True
+            skills_indent = indent
         continue
-    cmd = [
-        "npx", "--yes", "skills", "add", src,
-        "-g", "-y", "-s", skill, "-a", "opencode",
-    ]
-    print(f"→ skills add {src} -s {skill} -a opencode")
-    subprocess.run(cmd, check=False)
+    if indent <= skills_indent and s.endswith(":") and s != "skills:":
+        break
+    if not in_packages:
+        if s == "packages:":
+            in_packages = True
+            packages_indent = indent
+        continue
+    if indent <= packages_indent:
+        break
+    m_src = re.match(r"^([\w./-]+):\s*$", s)
+    if m_src and indent == packages_indent + 2:
+        cur_src = m_src.group(1)
+        packages.setdefault(cur_src, [])
+        continue
+    m_item = re.match(r"^-\s+(\S+)\s*$", s)
+    if m_item and cur_src is not None and indent > packages_indent + 2:
+        packages[cur_src].append(m_item.group(1))
+
+if not packages:
+    print("⚠ no skills.packages in manifest.yaml", file=sys.stderr)
+    sys.exit(0)
+
+for src, names in packages.items():
+    for skill in names:
+        if (agents / skill).exists():
+            print(f"→ skills skip (present): {skill}")
+            continue
+        cmd = [
+            "npx", "--yes", "skills", "add", src,
+            "-g", "-y", "-s", skill, "-a", "opencode",
+        ]
+        print(f"→ skills add {src} -s {skill} -a opencode")
+        subprocess.run(cmd, check=False)
 PY
 }
 
