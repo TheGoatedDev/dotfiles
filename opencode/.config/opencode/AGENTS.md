@@ -11,42 +11,18 @@ Default to:
 # Skills
 
 Load the matching skill when the task fits. Skills live under `~/.agents/skills` (linked into OpenCode).
+Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.packages` + `skills/custom/*`. Keep this list matched when those change.
 
 ## Process
 
 - `caveman` — terse compressed communication (also always-on via `opencode-caveman` plugin; `/caveman lite|full|ultra|off`)
-- `grill-me` — relentless design interview until decisions lock
-- `grill-with-docs` — same, while writing ADRs/glossary
-- `handoff` — compact session for another agent
-- `diagnose` — reproduce → minimise → hypothesise → instrument → fix
-- `improve-codebase-architecture` — deepening opportunities + HTML report
-- `thermo-nuclear-code-quality-review` — harsh maintainability review
+- `grill-with-docs` — design interview while writing ADRs/glossary
 - `tropes-fyi` — human prose; avoid AI-writing tells
+- `ponytail` — laziest solution that works (plugin `@dietrichgebert/ponytail`; `/ponytail lite|full|ultra`)
 
-## Docs
-
-- `find-docs` — current library/API docs via `ctx7` CLI (prefer over training data)
-
-## Browser / web
+## Browser
 
 - `agent-browser` — browser automation (pages, forms, screenshots)
-- `web-perf` — Core Web Vitals / perf audit
-- `seo-audit` — technical / on-page SEO diagnosis
-
-## Cloudflare
-
-- `cloudflare` — platform umbrella (Workers, KV, D1, R2, AI, …)
-- `wrangler` — Workers CLI deploy/dev/config
-- `workers-best-practices` — production Workers patterns
-- `durable-objects` — DO state, alarms, WS, SQLite
-- `agents-sdk` — Cloudflare Agents SDK
-- `turnstile-spin` — Turnstile end-to-end setup
-- `cloudflare-email-service` — Email Sending + Routing
-- `cloudflare-one` — Zero Trust / SASE
-- `cloudflare-one-migrations` — migrate to Cloudflare One
-- `sandbox-stable` — Sandbox SDK stable
-- `sandbox-next` — Sandbox SDK `@next` / 1.0 preview
-- `sandbox-migrate-to-next` — port stable → `@next`
 
 # CLI tools
 
