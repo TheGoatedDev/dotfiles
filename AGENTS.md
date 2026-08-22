@@ -62,6 +62,7 @@ OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencod
 ```bash
 ./install              # safe: refuse non-stow conflicts
 ./install --force      # backup conflicts → ~/.dotfiles-backup/<timestamp>/
+./install --reinstall  # brew reinstall each Brewfile formula/cask, then bundle
 ./install --skills-only
 ./install --check      # dry / drift oriented
 ./install --strict     # fail if secrets file missing

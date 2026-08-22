@@ -7,12 +7,15 @@ FORCE=0
 CHECK_ONLY=0
 SKILLS_ONLY=0
 STRICT_SECRETS=0
+BREW_REINSTALL=0
 
 usage() {
   cat <<'EOF'
 Usage: ./install [options]
 
   --force          Backup conflicting files, then stow
+  --reinstall      brew reinstall every formula/cask in the Brewfile
+                   (then normal install). Heavy; use when packages are broken.
   --check          Report drift only (no changes)
   --skills-only    Skills + opencode skill links only
   --strict         Fail if secrets file missing
@@ -23,6 +26,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --force) FORCE=1 ;;
+    --reinstall) BREW_REINSTALL=1 ;;
     --check) CHECK_ONLY=1 ;;
     --skills-only) SKILLS_ONLY=1 ;;
     --strict) STRICT_SECRETS=1 ;;
@@ -68,6 +72,26 @@ ensure_brew() {
 
 brew_bundle() {
   [[ -f "$BREWFILE" ]] || die "Missing Brewfile"
+  if (( BREW_REINSTALL )); then
+    log "brew reinstall (Brewfile formulae + casks)"
+    local line name
+    while IFS= read -r line; do
+      [[ "$line" == brew\ \"* ]] || continue
+      name="${line#brew \"}"
+      name="${name%%\"*}"
+      [[ -n "$name" ]] || continue
+      log "reinstall formula $name"
+      brew reinstall "$name" || warn "reinstall failed: $name"
+    done < "$BREWFILE"
+    while IFS= read -r line; do
+      [[ "$line" == cask\ \"* ]] || continue
+      name="${line#cask \"}"
+      name="${name%%\"*}"
+      [[ -n "$name" ]] || continue
+      log "reinstall cask $name"
+      brew reinstall --cask "$name" || warn "reinstall failed: $name"
+    done < "$BREWFILE"
+  fi
   log "brew bundle (no upgrade)"
   # Idempotent install only — don't pull multi‑GB cask upgrades mid-bootstrap
   brew bundle --file="$BREWFILE" --no-upgrade
