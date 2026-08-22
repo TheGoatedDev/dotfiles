@@ -73,7 +73,7 @@ Prefer these over reinventing. Do not reach for tools not listed here unless the
 
 # MCP
 
-Also available as MCP tools (not CLI): **exa** (web search), **linear**, **posthog**.
+Also available as MCP tools (not CLI): **exa** (web search), **posthog**.
 
 # Commits
 
