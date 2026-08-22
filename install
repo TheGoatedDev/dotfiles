@@ -48,11 +48,17 @@ expand_path() {
   print -r -- "${p:A}"
 }
 
-STOW_PACKAGES=(zsh git ghostty opencode)
+STOW_PACKAGES=(zsh git ghostty opencode tmux)
 ZSH_PLUGINS_DIR="$(expand_path ~/.zsh/plugins)"
 ZSH_PLUGIN_REPOS=(
   https://github.com/zsh-users/zsh-autosuggestions
   https://github.com/zsh-users/zsh-syntax-highlighting
+)
+TMUX_PLUGINS_DIR="$(expand_path ~/.config/tmux/plugins)"
+TMUX_PLUGIN_REPOS=(
+  https://github.com/tmux-plugins/tpm
+  https://github.com/tmux-plugins/tmux-sensible
+  https://github.com/catppuccin/tmux
 )
 MANIFEST="$REPO/manifest.yaml"
 CUSTOM_SKILLS_DIR="$REPO/skills/custom"
@@ -231,13 +237,15 @@ stow_package() {
   stow -d "$REPO" -t "$HOME_DIR" -R "$pkg"
 }
 
-clone_zsh_plugins() {
-  mkdir -p "$ZSH_PLUGINS_DIR"
+clone_git_repos() {
+  local dest_dir="$1"
+  shift
+  mkdir -p "$dest_dir"
   local url name dest
-  for url in "${ZSH_PLUGIN_REPOS[@]}"; do
+  for url in "$@"; do
     name="${url:t}"
     name="${name%.git}"
-    dest="$ZSH_PLUGINS_DIR/$name"
+    dest="$dest_dir/$name"
     if [[ -d "$dest/.git" ]]; then
       log "update plugin $name"
       git -C "$dest" pull --ff-only --quiet || warn "could not update $name"
@@ -246,6 +254,14 @@ clone_zsh_plugins() {
       git clone --depth 1 "$url" "$dest"
     fi
   done
+}
+
+clone_zsh_plugins() {
+  clone_git_repos "$ZSH_PLUGINS_DIR" "${ZSH_PLUGIN_REPOS[@]}"
+}
+
+clone_tmux_plugins() {
+  clone_git_repos "$TMUX_PLUGINS_DIR" "${TMUX_PLUGIN_REPOS[@]}"
 }
 
 check_secrets() {
@@ -431,6 +447,7 @@ if (( ! SKILLS_ONLY )); then
   brew_bundle
   ensure_stow
   clone_zsh_plugins
+  clone_tmux_plugins
   for pkg in "${STOW_PACKAGES[@]}"; do
     stow_package "$pkg"
   done

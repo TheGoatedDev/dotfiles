@@ -6,12 +6,20 @@ stow:
   - git
   - ghostty
   - opencode
+  - tmux
 
 zsh_plugins:
   dir: ~/.zsh/plugins
   repos:
     - https://github.com/zsh-users/zsh-autosuggestions
     - https://github.com/zsh-users/zsh-syntax-highlighting
+
+tmux_plugins:
+  dir: ~/.config/tmux/plugins
+  repos:
+    - https://github.com/tmux-plugins/tpm
+    - https://github.com/tmux-plugins/tmux-sensible
+    - https://github.com/catppuccin/tmux
 
 skills:
   agent: opencode

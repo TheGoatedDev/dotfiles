@@ -23,6 +23,7 @@ brew "pulumi"
 brew "rtk"
 brew "starship"
 brew "stow"
+brew "tmux"
 brew "typescript-language-server"
 brew "zoxide"
 brew "anomalyco/tap/opencode", trusted: true

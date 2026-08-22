@@ -24,7 +24,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `install` | Idempotent apply (zsh). Main entrypoint. |
 | `manifest.yaml` | Stow packages + [skills.sh](https://skills.sh) package list (`skills.packages`). |
 | `Brewfile` | Canonical Homebrew formulae/casks/vscode extensions to **ensure**. Does not uninstall extras on the machine. |
-| `zsh/`, `git/`, `ghostty/`, `opencode/` | Stow packages → `$HOME` (mirror home-relative paths). |
+| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/` | Stow packages → `$HOME` (mirror home-relative paths). |
 | `skills/custom/` | First-party skills; install symlinks into `~/.agents/skills/`. |
 | `env.example` | Template → `~/.config/secrets/env` (chmod 600). |
 | `gitconfig.local.example` | Template → `~/.gitconfig.local` (name/email/signing). |
@@ -38,6 +38,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `git` | `~/.gitconfig`, `~/.config/git/ignore` |
 | `ghostty` | `~/.config/ghostty/config` |
 | `opencode` | `~/.config/opencode/*` (json, AGENTS.md, plugins, package.json). No stowed `.gitignore` — pnpm may write lockfiles/local ignores under that dir. |
+| `tmux` | `~/.config/tmux/tmux.conf`. TPM plugins cloned by install into `~/.config/tmux/plugins/` (not stowed). |
 
 OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencode/skills/*` → `~/.agents/skills/*`.
 
@@ -46,6 +47,7 @@ OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencod
 | Goal | Do |
 |------|----|
 | Shell / PATH / aliases | Edit `zsh/.zshenv` or `zsh/.zshrc`, then `./install` or `stow -R zsh`. |
+| tmux conf | Edit `tmux/.config/tmux/tmux.conf`, then `./install` or `stow -R tmux`. |
 | Machine-only env (kube, SSH agent sock) | `~/.zshenv.local` (from example). Not in repo. |
 | Git identity | `~/.gitconfig.local`. Tracked `.gitconfig` is scrubbed + `include`s local. |
 | OpenCode config / plugins list | Edit `opencode/.config/opencode/opencode.json`. Pin plugins with `@pkg@version`. |
@@ -72,7 +74,7 @@ OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencod
 Rough order (full install):
 
 1. Ensure Homebrew; `brew bundle --file=Brewfile --no-upgrade`
-2. Ensure `stow`; clone/update zsh plugin git repos under `~/.zsh/plugins`
+2. Ensure `stow`; clone/update zsh plugins under `~/.zsh/plugins` and tmux plugins under `~/.config/tmux/plugins`
 3. Stow each package in `manifest.yaml`
 4. Warn/check secrets file
 5. `pnpm install` in `~/.config/opencode` if `package.json` present
