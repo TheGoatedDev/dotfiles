@@ -17,6 +17,7 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 
 - `caveman` — terse compressed communication (also always-on via `opencode-caveman` plugin; `/caveman lite|full|ultra|off`)
 - `grill-me` — relentless design interview until decisions lock
+- `grilling` — stress-test a plan/decision/idea (mattpocock grill triggers)
 - `grill-with-docs` — design interview while writing ADRs/glossary
 - `tropes-fyi` — human prose; avoid AI-writing tells
 - `ponytail` — laziest solution that works (plugin `@dietrichgebert/ponytail`; `/ponytail lite|full|ultra`)

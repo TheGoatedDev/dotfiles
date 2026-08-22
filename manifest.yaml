@@ -24,6 +24,7 @@ skills:
       - caveman
     mattpocock/skills:
       - grill-me
+      - grilling
       - grill-with-docs
     vercel-labs/agent-browser:
       - agent-browser
