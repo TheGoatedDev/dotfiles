@@ -13,11 +13,6 @@
       "url": "https://mcp.posthog.com/mcp"
     }
   },
-  "disabled_providers": [
-    "openrouter",
-    "opencode",
-    "ollama-cloud"
-  ],
   "plugin": [
     "@dietrichgebert/ponytail@4.9.0",
     "opencode-caveman@0.1.4"
