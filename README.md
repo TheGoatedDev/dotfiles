@@ -41,7 +41,8 @@ Open a new shell.
 ```bash
 ./install              # safe: refuses non-stow conflicts
 ./install --force      # backup conflicts to ~/.dotfiles-backup/<ts>/
-./install --reinstall  # brew reinstall formulae (+ casks only in a real Terminal with hidden sudo)
+./install --reinstall  # brew reinstall formulae only
+./install --reinstall-casks  # + casks via macOS password dialog
 ./install --skills-only
 ./install --check
 ./install --strict     # fail if secrets file missing

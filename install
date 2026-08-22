@@ -8,19 +8,19 @@ CHECK_ONLY=0
 SKILLS_ONLY=0
 STRICT_SECRETS=0
 BREW_REINSTALL=0
+BREW_REINSTALL_CASKS=0
 
 usage() {
   cat <<'EOF'
 Usage: ./install [options]
 
-  --force          Backup conflicting files, then stow
-  --reinstall      brew reinstall Brewfile formulae (and casks if a real TTY).
-                   Casks need admin; primes sudo with a hidden password prompt.
-                   Heavy; use when packages are broken.
-  --check          Report drift only (no changes)
-  --skills-only    Skills + opencode skill links only
-  --strict         Fail if secrets file missing
-  -h, --help       This help
+  --force             Backup conflicting files, then stow
+  --reinstall         brew reinstall Brewfile formulae only (no casks / no sudo)
+  --reinstall-casks   also reinstall Brewfile casks (needs GUI password dialog)
+  --check             Report drift only (no changes)
+  --skills-only       Skills + opencode skill links only
+  --strict            Fail if secrets file missing
+  -h, --help          This help
 EOF
 }
 
@@ -28,6 +28,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --force) FORCE=1 ;;
     --reinstall) BREW_REINSTALL=1 ;;
+    --reinstall-casks) BREW_REINSTALL=1; BREW_REINSTALL_CASKS=1 ;;
     --check) CHECK_ONLY=1 ;;
     --skills-only) SKILLS_ONLY=1 ;;
     --strict) STRICT_SECRETS=1 ;;
@@ -71,14 +72,37 @@ ensure_brew() {
   eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 }
 
+# GUI askpass — never read password from terminal (avoids plaintext echo bugs)
+_brew_sudo_askpass() {
+  local script="$REPO/.cache/sudo-askpass.zsh"
+  mkdir -p "$REPO/.cache"
+  cat > "$script" <<'ASK'
+#!/bin/zsh
+pw=$(osascript <<'APP'
+try
+  tell application "System Events"
+    activate
+    set r to display dialog "Homebrew needs your Mac password for cask install." ¬
+      default answer "" with hidden answer ¬
+      buttons {"Cancel", "OK"} default button "OK" with title "dotfiles install"
+  end tell
+  return text returned of r
+on error
+  return ""
+end try
+APP
+)
+print -r -- "$pw"
+ASK
+  chmod 700 "$script"
+  print -r -- "$script"
+}
+
 brew_reinstall_from_file() {
   [[ -f "$BREWFILE" ]] || die "Missing Brewfile"
-  local line name
-  local has_tty=0
-  # Need a real terminal for admin password (casks). Piped/agent stdin = broken echo.
-  [[ -t 0 && -t 1 && -t 2 ]] && has_tty=1
+  local line name askpass sudo_keeper=0
 
-  log "brew reinstall (Brewfile formulae)"
+  log "brew reinstall (Brewfile formulae — no sudo)"
   while IFS= read -r line; do
     [[ "$line" == brew\ \"* ]] || continue
     name="${line#brew \"}"
@@ -88,28 +112,36 @@ brew_reinstall_from_file() {
     brew reinstall "$name" || warn "reinstall failed: $name"
   done < "$BREWFILE"
 
-  if (( ! has_tty )); then
-    warn "no TTY — skipping cask reinstall (would prompt for password unsafely)"
-    warn "run in Terminal: ./install --reinstall"
+  if (( ! BREW_REINSTALL_CASKS )); then
+    log "skipping casks (pass --reinstall-casks to reinstall GUI apps)"
     return 0
   fi
 
-  # Secure password prompt once; brew casks reuse the sudo ticket
-  log "admin password (hidden) for cask reinstalls…"
-  if ! sudo -v; then
-    warn "sudo failed — skipping cask reinstalls"
+  if ! command -v osascript >/dev/null 2>&1; then
+    warn "osascript missing — cannot prompt for password safely; skip casks"
     return 0
   fi
-  # keep sudo alive while casks run
-  local sudo_keeper=0
+
+  askpass="$(_brew_sudo_askpass)"
+  export SUDO_ASKPASS="$askpass"
+  # Force sudo/brew to use askpass (hidden dialog), never terminal Password:
+  export SUDO_ASKPASS_REQUIRE=force
+  log "cask reinstalls will use a macOS password dialog (hidden input)"
+
+  if ! sudo -A -v; then
+    warn "admin auth failed/cancelled — skipping casks"
+    unset SUDO_ASKPASS SUDO_ASKPASS_REQUIRE
+    return 0
+  fi
+
   (
     while true; do
-      sudo -n true 2>/dev/null || exit 0
+      sudo -A -n true 2>/dev/null || exit 0
       sleep 30
     done
   ) &
   sudo_keeper=$!
-  trap "kill $sudo_keeper 2>/dev/null || true" EXIT INT TERM
+  trap "kill $sudo_keeper 2>/dev/null || true; unset SUDO_ASKPASS SUDO_ASKPASS_REQUIRE" EXIT INT TERM
 
   log "brew reinstall (Brewfile casks)"
   while IFS= read -r line; do
@@ -118,12 +150,14 @@ brew_reinstall_from_file() {
     name="${name%%\"*}"
     [[ -n "$name" ]] || continue
     log "reinstall cask $name"
+    # HOMEBREW_SUDO_THROUGH_SUDO_ASKPASS if available; else rely on cached sudo ticket
     brew reinstall --cask "$name" || warn "reinstall failed: $name"
-    sudo -v 2>/dev/null || true
+    sudo -A -v 2>/dev/null || true
   done < "$BREWFILE"
 
   kill $sudo_keeper 2>/dev/null || true
   trap - EXIT INT TERM
+  unset SUDO_ASKPASS SUDO_ASKPASS_REQUIRE
 }
 
 brew_bundle() {
