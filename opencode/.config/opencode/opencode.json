@@ -19,7 +19,7 @@
     "ollama-cloud"
   ],
   "plugin": [
-    "@dietrichgebert/ponytail",
-    "opencode-caveman"
+    "@dietrichgebert/ponytail@4.9.0",
+    "opencode-caveman@0.1.4"
   ]
 }
