@@ -1,0 +1,5 @@
+# Copy to ~/.zshenv.local (not tracked)
+# Machine-specific env only.
+
+# export KUBECONFIG="$HOME/.kube/configs/k3s.yaml"
+# export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"

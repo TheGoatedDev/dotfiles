@@ -1,0 +1,29 @@
+# Dotfiles manifest — stow packages + skills wiring.
+# Brew lives in Brewfile (canonical).
+
+stow:
+  - zsh
+  - git
+  - ghostty
+  - opencode
+
+zsh_plugins:
+  dir: ~/.zsh/plugins
+  repos:
+    - https://github.com/zsh-users/zsh-autosuggestions
+    - https://github.com/zsh-users/zsh-syntax-highlighting
+
+skills:
+  lockfile: skills-lock.json
+  custom_dir: skills/custom
+  agents_dir: ~/.agents/skills
+  opencode_skills_dir: ~/.config/opencode/skills
+
+brewfile: Brewfile
+
+secrets:
+  path: ~/.config/secrets/env
+  example: env.example
+
+opencode:
+  dir: ~/.config/opencode

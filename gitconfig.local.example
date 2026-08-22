@@ -1,0 +1,5 @@
+# Copy to ~/.gitconfig.local (not tracked)
+[user]
+	name = Your Name
+	email = you@example.com
+	# signingkey = ssh-ed25519 AAAA...

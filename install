@@ -1,0 +1,295 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+REPO="${0:A:h}"
+HOME_DIR="${HOME:A}"
+FORCE=0
+CHECK_ONLY=0
+SKILLS_ONLY=0
+STRICT_SECRETS=0
+
+usage() {
+  cat <<'EOF'
+Usage: ./install [options]
+
+  --force          Backup conflicting files, then stow
+  --check          Report drift only (no changes)
+  --skills-only    Skills + opencode skill links only
+  --strict         Fail if secrets file missing
+  -h, --help       This help
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force) FORCE=1 ;;
+    --check) CHECK_ONLY=1 ;;
+    --skills-only) SKILLS_ONLY=1 ;;
+    --strict) STRICT_SECRETS=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage; exit 1 ;;
+  esac
+  shift
+done
+
+log() { print -r -- "→ $*"; }
+warn() { print -r -- "⚠ $*" >&2; }
+die() { print -r -- "✗ $*" >&2; exit 1; }
+
+expand_path() {
+  local p="$1"
+  p="${p/#\~/$HOME_DIR}"
+  print -r -- "${p:A}"
+}
+
+STOW_PACKAGES=(zsh git ghostty opencode)
+ZSH_PLUGINS_DIR="$(expand_path ~/.zsh/plugins)"
+ZSH_PLUGIN_REPOS=(
+  https://github.com/zsh-users/zsh-autosuggestions
+  https://github.com/zsh-users/zsh-syntax-highlighting
+)
+SKILLS_LOCK="$REPO/skills-lock.json"
+CUSTOM_SKILLS_DIR="$REPO/skills/custom"
+AGENTS_SKILLS_DIR="$(expand_path ~/.agents/skills)"
+OPENCODE_SKILLS_DIR="$(expand_path ~/.config/opencode/skills)"
+OPENCODE_DIR="$(expand_path ~/.config/opencode)"
+SECRETS_PATH="$(expand_path ~/.config/secrets/env)"
+BREWFILE="$REPO/Brewfile"
+BACKUP_ROOT="$(expand_path ~/.dotfiles-backup)/$(date +%Y%m%d-%H%M%S)"
+
+ensure_brew() {
+  if command -v brew >/dev/null 2>&1; then
+    return 0
+  fi
+  log "Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+}
+
+brew_bundle() {
+  [[ -f "$BREWFILE" ]] || die "Missing Brewfile"
+  log "brew bundle (no upgrade)"
+  # Idempotent install only — don't pull multi‑GB cask upgrades mid-bootstrap
+  brew bundle --file="$BREWFILE" --no-upgrade
+}
+
+ensure_stow() {
+  command -v stow >/dev/null 2>&1 || brew install stow
+}
+
+backup_path() {
+  local target="$1"
+  local rel="${target#$HOME_DIR/}"
+  local dest="$BACKUP_ROOT/$rel"
+  mkdir -p "${dest:h}"
+  mv "$target" "$dest"
+  log "backed up $target → $dest"
+}
+
+# True if path is already a symlink into this repo
+is_repo_link() {
+  local target="$1"
+  [[ -L "$target" ]] || return 1
+  local resolved
+  resolved="$(readlink "$target")"
+  [[ "$resolved" == "$REPO"/* ]] && return 0
+  # relative link: resolve
+  local abs="${target:A}"
+  [[ "$abs" == "$REPO"/* ]]
+}
+
+stow_package() {
+  local pkg="$1"
+  local pkg_dir="$REPO/$pkg"
+  [[ -d "$pkg_dir" ]] || die "Missing package: $pkg"
+
+  # Conflict scan: files that would be replaced
+  local conflicts=()
+  local f rel dest
+  while IFS= read -r -d '' f; do
+    rel="${f#$pkg_dir/}"
+    dest="$HOME_DIR/$rel"
+    [[ -e "$dest" || -L "$dest" ]] || continue
+    if is_repo_link "$dest"; then
+      continue
+    fi
+    # already correct absolute link into package
+    if [[ -L "$dest" ]]; then
+      local link
+      link="$(readlink "$dest")"
+      [[ "$link" == "$pkg_dir/$rel" || "${dest:A}" == "$f" ]] && continue
+    fi
+    conflicts+=("$dest")
+  done < <(find "$pkg_dir" -type f -print0)
+
+  if (( ${#conflicts[@]} > 0 )); then
+    if (( FORCE )); then
+      mkdir -p "$BACKUP_ROOT"
+      local c
+      for c in "${conflicts[@]}"; do
+        backup_path "$c"
+      done
+    else
+      warn "Conflicts for package $pkg (re-run with --force):"
+      print -l -- "${conflicts[@]}"
+      die "stow aborted"
+    fi
+  fi
+
+  log "stow $pkg"
+  stow -d "$REPO" -t "$HOME_DIR" -R "$pkg"
+}
+
+clone_zsh_plugins() {
+  mkdir -p "$ZSH_PLUGINS_DIR"
+  local url name dest
+  for url in "${ZSH_PLUGIN_REPOS[@]}"; do
+    name="${url:t}"
+    name="${name%.git}"
+    dest="$ZSH_PLUGINS_DIR/$name"
+    if [[ -d "$dest/.git" ]]; then
+      log "update plugin $name"
+      git -C "$dest" pull --ff-only --quiet || warn "could not update $name"
+    else
+      log "clone plugin $name"
+      git clone --depth 1 "$url" "$dest"
+    fi
+  done
+}
+
+check_secrets() {
+  if [[ -f "$SECRETS_PATH" ]]; then
+    log "secrets ok ($SECRETS_PATH)"
+    return 0
+  fi
+  warn "Missing secrets file: $SECRETS_PATH"
+  warn "Copy $REPO/env.example → $SECRETS_PATH && chmod 600"
+  (( STRICT_SECRETS )) && die "secrets required (--strict)"
+}
+
+install_skills_external() {
+  [[ -f "$SKILLS_LOCK" ]] || { warn "no skills-lock.json"; return 0; }
+  mkdir -p "$AGENTS_SKILLS_DIR" "$HOME_DIR/.agents"
+  cp "$SKILLS_LOCK" "$HOME_DIR/.agents/.skill-lock.json"
+
+  # OpenCode only. Skip if already present under ~/.agents/skills.
+  python3 - <<'PY' "$SKILLS_LOCK" "$AGENTS_SKILLS_DIR" || true
+import json, subprocess, sys
+from pathlib import Path
+lock = json.loads(Path(sys.argv[1]).read_text())
+agents = Path(sys.argv[2])
+# skill renames in upstream repos
+ALIASES = {"diagnose": "diagnosing-bugs"}
+for name, meta in lock.get("skills", {}).items():
+    skill = ALIASES.get(name, name)
+    if (agents / skill).exists() or (agents / name).exists():
+        print(f"→ skills skip (present): {skill}")
+        continue
+    src = meta.get("source") or ""
+    if not src:
+        continue
+    cmd = [
+        "npx", "--yes", "skills", "add", src,
+        "-g", "-y", "-s", skill, "-a", "opencode",
+    ]
+    print(f"→ skills add {src} -s {skill} -a opencode")
+    subprocess.run(cmd, check=False)
+PY
+}
+
+link_custom_skills() {
+  mkdir -p "$AGENTS_SKILLS_DIR"
+  [[ -d "$CUSTOM_SKILLS_DIR" ]] || return 0
+  local d name dest
+  for d in "$CUSTOM_SKILLS_DIR"/*(N/); do
+    name="${d:t}"
+    dest="$AGENTS_SKILLS_DIR/$name"
+    if [[ -e "$dest" || -L "$dest" ]]; then
+      if [[ -L "$dest" && "$(readlink "$dest")" == "$d" ]]; then
+        continue
+      fi
+      if (( FORCE )); then
+        rm -rf "$dest"
+      else
+        warn "custom skill exists (not link to repo): $dest — use --force"
+        continue
+      fi
+    fi
+    log "link custom skill $name"
+    ln -s "$d" "$dest"
+  done
+}
+
+relink_opencode_skills() {
+  mkdir -p "$OPENCODE_SKILLS_DIR" "$AGENTS_SKILLS_DIR"
+  # remove managed links / empty; keep unknown non-links only with --force wipe of links
+  local f
+  for f in "$OPENCODE_SKILLS_DIR"/*(N); do
+    [[ -e "$f" || -L "$f" ]] || continue
+    if [[ -L "$f" ]]; then
+      rm -f "$f"
+    elif (( FORCE )); then
+      rm -rf "$f"
+    else
+      warn "skip non-link in opencode skills: $f"
+    fi
+  done
+  local s name
+  for s in "$AGENTS_SKILLS_DIR"/*(N/); do
+    name="${s:t}"
+    ln -sfn "$s" "$OPENCODE_SKILLS_DIR/$name"
+  done
+  log "opencode skills linked ($(ls -1 "$OPENCODE_SKILLS_DIR" | wc -l | tr -d ' '))"
+}
+
+opencode_pnpm() {
+  [[ -f "$OPENCODE_DIR/package.json" ]] || return 0
+  if command -v pnpm >/dev/null 2>&1; then
+    log "pnpm install (opencode config)"
+    (cd "$OPENCODE_DIR" && pnpm install)
+  else
+    warn "pnpm not found; skip opencode plugin install"
+  fi
+}
+
+check_drift() {
+  log "check mode"
+  local pkg
+  for pkg in "${STOW_PACKAGES[@]}"; do
+    stow -d "$REPO" -t "$HOME_DIR" -n -v "$pkg" 2>&1 || true
+  done
+  [[ -f "$SECRETS_PATH" ]] || warn "secrets missing"
+  return 0
+}
+
+# --- main ---
+cd "$REPO"
+
+if (( CHECK_ONLY )); then
+  check_drift
+  exit 0
+fi
+
+if (( ! SKILLS_ONLY )); then
+  ensure_brew
+  brew_bundle
+  ensure_stow
+  clone_zsh_plugins
+  for pkg in "${STOW_PACKAGES[@]}"; do
+    stow_package "$pkg"
+  done
+  check_secrets
+  opencode_pnpm
+fi
+
+install_skills_external
+link_custom_skills
+relink_opencode_skills
+
+log "done"
+print -r -- ""
+print -r -- "Next (if first machine):"
+print -r -- "  cp $REPO/env.example ~/.config/secrets/env && chmod 600 ~/.config/secrets/env"
+print -r -- "  cp $REPO/gitconfig.local.example ~/.gitconfig.local   # edit name/email"
+print -r -- "  cp $REPO/zshenv.local.example ~/.zshenv.local         # kube/ssh if needed"
+print -r -- "  open a new shell"

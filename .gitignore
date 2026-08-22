@@ -1,0 +1,13 @@
+.DS_Store
+**/.DS_Store
+node_modules/
+*.local
+.env
+.env.*
+!.env.example
+secrets/
+**/secrets/
+*.pem
+*.key
+.opencode/
+*.log
