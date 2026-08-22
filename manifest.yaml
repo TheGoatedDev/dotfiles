@@ -32,6 +32,19 @@ skills:
       - find-docs
     vercel-labs/skills:
       - find-skills
+    leonxlnx/taste-skill:
+      - design-taste-frontend
+    pbakaus/impeccable:
+      - impeccable
+    vercel-labs/agent-skills:
+      - web-design-guidelines
+    CFLW-AI/wcag-audit-claude-skill:
+      - wcag-audit
+    zivtech/accessibility-skills:
+      - a11y-planner
+      - a11y-critic
+      - a11y-test
+      - perspective-audit
 
 brewfile: Brewfile
 

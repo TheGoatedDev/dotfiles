@@ -21,6 +21,20 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 
 - `agent-browser` — browser automation (pages, forms, screenshots)
 
+## Design
+
+- `design-taste-frontend` — distinctive landings/portfolios; avoid AI-template UI
+- `impeccable` — design craft (`/impeccable polish|audit|critique|…`); PRODUCT.md/DESIGN.md
+- `web-design-guidelines` — audit UI vs Vercel Web Interface Guidelines
+
+## Accessibility
+
+- `wcag-audit` — WCAG 2.2 AA page/HTML audit + contrast numbers (static; published eval)
+- `a11y-planner` — design accessibility before coding
+- `a11y-critic` — review a11y plan or implementation
+- `a11y-test` — Playwright keyboard + axe-core loop
+- `perspective-audit` — deep review when planner/critic escalate perspectives
+
 # Policy
 
 - Atomic commits when a unit of work is done; do not wait to be asked.
