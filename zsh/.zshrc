@@ -50,37 +50,3 @@ if command -v nvm >/dev/null 2>&1; then
   add-zsh-hook chpwd _nvm_use_project_version
   _nvm_use_project_version
 fi
-
-# --- Git worktrees ---
-_agent_worktree_dir() {
-  local IFS=-
-  echo ".worktree/$*"
-}
-
-_agent_worktree_branch() {
-  local IFS=-
-  echo "feature/$*"
-}
-
-_agent_prune_worktrees() {
-  local keep_count=5 worktree_root=".worktree"
-  [[ -d "$worktree_root" ]] || return 0
-  local -a worktrees
-  worktrees=($worktree_root/*(/om))
-  local worktree
-  for worktree in "${worktrees[@]:$keep_count}"; do
-    git worktree remove --force "$worktree"
-  done
-}
-
-wt() {
-  if [[ $# -eq 0 ]]; then
-    echo "Usage: wt <worktree-name>"
-    return 1
-  fi
-  local dir="$(_agent_worktree_dir "$@")"
-  local branch="$(_agent_worktree_branch "$@")"
-  git worktree add "$dir" -b "$branch" 2>/dev/null || git worktree add "$dir" "$branch"
-  _agent_prune_worktrees
-  cd "$dir"
-}
