@@ -361,7 +361,8 @@ relink_opencode_skills() {
     fi
   done
   local s name
-  for s in "$AGENTS_SKILLS_DIR"/*(N/); do
+  # -/ follows symlinks (custom skills are links into the repo)
+  for s in "$AGENTS_SKILLS_DIR"/*(N-/); do
     name="${s:t}"
     ln -sfn "$s" "$OPENCODE_SKILLS_DIR/$name"
   done
