@@ -2,6 +2,8 @@
 
 Public, idempotent macOS setup: shell configs (Stow), Homebrew (`Brewfile`), OpenCode, and agent skills (`skills.sh` + custom).
 
+**Agents:** see [AGENTS.md](./AGENTS.md) for how the repo is wired.
+
 ## Quick start
 
 ```bash
