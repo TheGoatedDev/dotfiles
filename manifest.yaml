@@ -28,6 +28,10 @@ skills:
       - grill-with-docs
     vercel-labs/agent-browser:
       - agent-browser
+    upstash/context7:
+      - find-docs
+    vercel-labs/skills:
+      - find-skills
 
 brewfile: Brewfile
 

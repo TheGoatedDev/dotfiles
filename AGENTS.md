@@ -3,7 +3,7 @@
 Public, idempotent **macOS** setup repo. Edit files **here**, apply with `./install`, live config under `$HOME` is mostly **symlinks** (GNU Stow).
 
 Human quickstart: [README.md](./README.md).  
-OpenCode **runtime** persona / skills / CLIs: [opencode/.config/opencode/AGENTS.md](./opencode/.config/opencode/AGENTS.md).
+OpenCode **skill index** (user-scope): [opencode/.config/opencode/AGENTS.md](./opencode/.config/opencode/AGENTS.md).
 
 ## Mental model
 
@@ -49,7 +49,7 @@ OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencod
 | Machine-only env (kube, SSH agent sock) | `~/.zshenv.local` (from example). Not in repo. |
 | Git identity | `~/.gitconfig.local`. Tracked `.gitconfig` is scrubbed + `include`s local. |
 | OpenCode config / plugins list | Edit `opencode/.config/opencode/opencode.json`. Pin plugins with `@pkg@version`. |
-| OpenCode runtime rules | Edit `opencode/.config/opencode/AGENTS.md` (stowed → `~/.config/opencode/AGENTS.md`). Keep in sync when skills/stack change — see below. |
+| OpenCode skill index | Edit `opencode/.config/opencode/AGENTS.md` (stowed → `$HOME/.config/opencode/AGENTS.md`). Skills list only — see below. |
 | Local OpenCode plugin file | `opencode/.config/opencode/plugins/*.ts`, then `./install` (runs `pnpm install` in config dir). |
 | Homebrew set | Edit `Brewfile` only. `brew bundle --no-upgrade` via install. Leaving something out of the Brewfile does **not** uninstall it. |
 | External skill | Add under `skills.packages` in `manifest.yaml` (`source: [name, …]`), then `./install --skills-only`. |
@@ -84,7 +84,7 @@ Rough order (full install):
 
 - **Shell:** zsh; plugins via git clones (not full Oh My Zsh).
 - **Agent:** OpenCode only (no Claude Code / Codex in this setup).
-- **Docs lookup:** `ctx7` CLI (see OpenCode AGENTS.md); Context7 is not an MCP server here.
+- **Docs lookup:** `find-docs` skill (`ctx7` CLI); Context7 is not an MCP server here.
 - **Web:** built-in `websearch` off; **Exa MCP** for search; built-in `webfetch` for URLs.
 - **Plugins (npm, pinned in opencode.json):** `@dietrichgebert/ponytail`, `opencode-caveman`.
 
@@ -106,5 +106,6 @@ Rough order (full install):
 - Prefer small commits: one logical change (Brewfile vs opencode vs zsh).
 - After config edits that affect the live machine, run `./install` (or targeted stow) and sanity-check `readlink` on a few targets.
 - Do not “fix” live `~/.config/opencode` and forget the package under `opencode/` — the package is source of truth.
-- **Keep OpenCode user-scope AGENTS.md in sync.** Any change that affects the agent’s runtime view (skills add/remove, plugins, preferred CLIs, MCP, web search, stack assumptions, install workflow) must update `opencode/.config/opencode/AGENTS.md` in the same change. That file is stowed to `$HOME/.config/opencode/AGENTS.md` — do not edit the home path separately. Skills list there must match `manifest.yaml` `skills.packages` + `skills/custom/*` (and drop entries for anything removed).
+- **OpenCode AGENTS.md = skill index, not a manual.** List installed skills with a one-line trigger each. Do **not** put Role/persona text, CLI recipes, browser steps, ctx7 workflows, or other tool how-tos there — that belongs in each skill’s `SKILL.md`; load the skill when the task matches. Before removing instructions from OpenCode AGENTS, ensure a skill covers them (prefer skills.sh packages). Missing capability → use `find-skills`, then pin the winner under `manifest.yaml` `skills.packages` (do not only install locally).
+- **Keep the skill index in sync.** Skills add/remove/rename must update `opencode/.config/opencode/AGENTS.md` in the same change. That file is stowed to `$HOME/.config/opencode/AGENTS.md` — do not edit the home path separately. List must match `manifest.yaml` `skills.packages` + `skills/custom/*` (+ plugin skills like ponytail/caveman if listed). Drop entries for anything removed.
 - **No machine-layout paths in tracked files.** Do not hardcode clone locations (e.g. `~/Projects/...`), hostnames, or per-box tool paths. Use `$HOME` / install defaults; put machine-only env in `$HOME/.zshenv.local` (untracked).

@@ -65,4 +65,4 @@ Never commit real keys. Only `env.example` is tracked. Live file: `~/.config/sec
 
 Stowed under `~/.config/opencode` (config, AGENTS.md, plugins). `./install` runs `pnpm install` there for plugin deps.
 
-Docs CLI: `ctx7` (pnpm global), not Context7 MCP.
+Library docs: `find-docs` skill (`ctx7` CLI). Discover more skills: `find-skills`.
