@@ -42,7 +42,9 @@ Open a new shell.
 ./install              # safe: refuses non-stow conflicts
 ./install --force      # backup conflicts to ~/.dotfiles-backup/<ts>/
 ./install --reinstall        # brew reinstall formulae only (no sudo)
-./install --reinstall-casks  # casks only; run in Terminal, sudo -v (hidden)
+./install --reinstall-casks  # casks only (skips docker-desktop); Terminal + sudo -v
+# Docker Desktop (privileged helpers) — fix/install only in Terminal:
+#   brew install --cask --force docker-desktop
 ./install --skills-only
 ./install --check
 ./install --strict     # fail if secrets file missing

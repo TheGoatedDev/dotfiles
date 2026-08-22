@@ -87,40 +87,59 @@ brew_reinstall_formulae() {
   done < "$BREWFILE"
 }
 
+# Casks that need multi-step privileged helpers — reinstall breaks mid-flight.
+# Install/upgrade via normal `brew bundle` only; never brew reinstall.
+CASK_REINSTALL_SKIP=(docker-desktop)
+
 brew_reinstall_casks() {
   [[ -f "$BREWFILE" ]] || die "Missing Brewfile"
-  local line name sudo_keeper=0
+  local line name sudo_keeper=0 skip
 
   if [[ ! -t 0 || ! -t 1 || ! -t 2 ]]; then
-    die "cask reinstall needs a real Terminal (not a pipe/agent). Run:\n  cd $REPO && sudo -v && ./install --reinstall-casks"
+    die "cask reinstall needs a real Terminal. Run:\n  cd $REPO && ./install --reinstall-casks"
   fi
 
-  # Clear broken askpass so sudo uses the terminal (hidden input)
   unset SUDO_ASKPASS SUDO_ASKPASS_REQUIRE
-  log "admin password (hidden in Terminal) for cask reinstalls…"
+  log "admin password once (should stay hidden)…"
   if ! sudo -v; then
-    die "sudo failed — wrong password or cancelled. Try again in Terminal."
+    die "sudo failed — wrong password or cancelled."
   fi
 
+  # Refresh sudo every 10s so long casks (and brew's own sudo calls) stay authenticated
   (
     while true; do
       sudo -n true 2>/dev/null || exit 0
-      sleep 30
+      sleep 10
     done
   ) &
   sudo_keeper=$!
   trap "kill $sudo_keeper 2>/dev/null || true" EXIT INT TERM
 
   export HOMEBREW_NO_ENV_HINTS=1
-  log "brew reinstall (Brewfile casks only)"
+  log "brew reinstall (Brewfile casks; skips: ${(j:, :)CASK_REINSTALL_SKIP})"
   while IFS= read -r line; do
     [[ "$line" == cask\ \"* ]] || continue
     name="${line#cask \"}"
     name="${name%%\"*}"
     [[ -n "$name" ]] || continue
+    skip=0
+    for s in "${CASK_REINSTALL_SKIP[@]}"; do
+      [[ "$name" == "$s" ]] && skip=1 && break
+    done
+    if (( skip )); then
+      log "skip reinstall $name (use: brew install --cask $name)"
+      continue
+    fi
+    # zulu@* are .pkg installers — reinstall is slow; only if missing from /Library/Java
+    if [[ "$name" == zulu@* ]]; then
+      if /usr/libexec/java_home -v "${name#zulu@}" >/dev/null 2>&1; then
+        log "skip $name (JDK already registered)"
+        continue
+      fi
+    fi
     log "reinstall cask $name"
-    brew reinstall --cask "$name" || warn "reinstall failed: $name"
     sudo -v 2>/dev/null || true
+    brew reinstall --cask "$name" || warn "reinstall failed: $name"
   done < "$BREWFILE"
 
   kill $sudo_keeper 2>/dev/null || true

@@ -63,7 +63,8 @@ OpenCode **skills** are not stowed as trees: install rebuilds `~/.config/opencod
 ./install              # safe: refuse non-stow conflicts
 ./install --force      # backup conflicts → ~/.dotfiles-backup/<timestamp>/
 ./install --reinstall        # brew reinstall formulae only (no sudo)
-./install --reinstall-casks  # casks only; real Terminal + sudo -v (hidden password)
+./install --reinstall-casks  # casks only; skips docker-desktop (too privileged for reinstall)
+# Docker: brew install --cask --force docker-desktop  (real Terminal, sudo)
 ./install --skills-only
 ./install --check      # dry / drift oriented
 ./install --strict     # fail if secrets file missing
