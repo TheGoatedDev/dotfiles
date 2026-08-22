@@ -71,9 +71,15 @@ Prefer these over reinventing. Do not reach for tools not listed here unless the
 | `act` | run GitHub Actions locally |
 | `stow` | only when changing Dotfiles layout |
 
+# Web
+
+- **Search** → Exa MCP tools only. Built-in `websearch` is disabled.
+- **Fetch a URL** → built-in `webfetch`.
+- Do not set `OPENCODE_ENABLE_EXA` (that re-enables built-in search).
+
 # MCP
 
-Also available as MCP tools (not CLI): **exa** (web search), **posthog**.
+Also available as MCP tools (not CLI): **exa** (web search — prefer this), **posthog**.
 
 # Commits
 
