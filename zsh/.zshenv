@@ -1,3 +1,7 @@
+# The following lines were added by Docker Desktop to add commands to your PATH.
+export PATH="$PATH:/Users/tom/.docker/bin"
+# End of Docker Desktop section.
+
 # zshenv — all zsh shells. Pure env only. Managed by dotfiles.
 
 if [[ -x /opt/homebrew/bin/brew ]]; then
