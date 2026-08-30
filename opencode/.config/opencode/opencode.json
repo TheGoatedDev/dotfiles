@@ -38,5 +38,11 @@
   "plugin": [
     "@dietrichgebert/ponytail@4.9.0",
     "opencode-caveman@0.1.4"
-  ]
+  ],
+  "references": {
+    "obsidian": {
+      "path": "~/Obsidian",
+      "description": "Personal Obsidian vault. Use when looking up personal notes or knowledge not in the current project."
+    }
+  }
 }
