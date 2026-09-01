@@ -34,6 +34,7 @@ skills:
       - grill-me
       - grilling
       - grill-with-docs
+      - domain-modeling
     vercel-labs/agent-browser:
       - agent-browser
     upstash/context7:
