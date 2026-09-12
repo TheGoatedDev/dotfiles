@@ -2,6 +2,8 @@
   "$schema": "https://opencode.ai/config.json",
   "lsp": true,
   "formatter": true,
+  "compaction": { "auto": true, "prune": true, "tail_turns": 8 },
+  "tool_output": { "max_lines": 400, "max_bytes": 16384 },
   "tools": {
     "websearch": false,
     "webfetch": true
