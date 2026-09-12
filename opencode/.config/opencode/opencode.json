@@ -8,24 +8,6 @@
     "websearch": false,
     "webfetch": true
   },
-  "provider": {
-    "ollama": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama (local)",
-      "options": {
-        "baseURL": "http://localhost:11434/v1"
-      },
-      "models": {
-        "qwen3.8:27b-mlx": {
-          "name": "Qwen3.8 27B MLX",
-          "limit": {
-            "context": 262144,
-            "output": 16384
-          }
-        }
-      }
-    }
-  },
   "mcp": {
     "exa": {
       "type": "remote",
@@ -35,6 +17,11 @@
     "posthog": {
       "type": "remote",
       "url": "https://mcp.posthog.com/mcp"
+    },
+    "linear": {
+      "type": "remote",
+      "url": "https://mcp.linear.app/mcp",
+      "enabled": true
     }
   },
   "plugin": [
