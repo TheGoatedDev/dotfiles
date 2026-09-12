@@ -9,6 +9,20 @@
     "webfetch": true
   },
   "agent": {
+    "explore": {
+      "description": "Use for unknown local files, symbols, call sites, repo layout. Read-only glob/grep/read. Primary MUST Task explore instead of scanning a large tree itself. Skip if the exact path is already known.",
+      "mode": "subagent",
+      "model": "opencode/muse-spark-1.3-contributor-free",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "deny",
+        "exa_*": "deny",
+        "skill": {
+          "find-docs": "deny"
+        }
+      }
+    },
     "scout": {
       "description": "Use for library/API docs, upstream deps, and web research. ctx7 CLI (find-docs), Exa, webfetch. Primary MUST Task scout instead of guessing APIs or searching the web.",
       "mode": "subagent",
