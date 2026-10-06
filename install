@@ -211,6 +211,8 @@ stow_package() {
     if is_repo_link "$dest"; then
       continue
     fi
+    # inside a folded dir link (stow linked the parent dir into the package)
+    [[ "${dest:A}" == "$f" ]] && continue
     # already correct absolute link into package
     if [[ -L "$dest" ]]; then
       local link
@@ -439,19 +441,22 @@ claude_setup() {
   done
   # Claude plugins: marketplace (git URL pinned with #ref) + plugin@marketplace.
   # caveman: always-on via SessionStart hook (OpenCode uses opencode-caveman).
-  local market ref plugin
+  # capture first: grep -q + pipefail would SIGPIPE the producer
+  local market ref plugin markets plugins
+  markets="$(claude plugin marketplace list 2>/dev/null || true)"
+  plugins="$(claude plugin list 2>/dev/null || true)"
   for market ref plugin in "${CLAUDE_PLUGINS[@]}"; do
-    if ! claude plugin marketplace list 2>/dev/null | grep -q "❯ $market\$"; then
+    if ! grep -q "❯ $market\$" <<<"$markets"; then
       log "claude marketplace add $market ($ref)"
       claude plugin marketplace add "$ref" >/dev/null || { warn "marketplace add failed: $market"; continue; }
     fi
-    claude plugin list 2>/dev/null | grep -q "❯ $plugin@$market\$" && continue
+    grep -q "❯ $plugin@$market\$" <<<"$plugins" && continue
     log "claude plugin install $plugin@$market"
     claude plugin install "$plugin@$market" >/dev/null || warn "plugin install failed: $plugin@$market"
   done
   claude_deny_rules
   # RTK hook in ~/.claude/settings.json (OpenCode gets plugins/rtk.ts instead)
-  if command -v rtk >/dev/null 2>&1 && ! rtk init --show 2>/dev/null | grep -q '^\[ok\] Hook'; then
+  if command -v rtk >/dev/null 2>&1 && ! grep -q '^\[ok\] Hook' <<<"$(rtk init --show 2>/dev/null || true)"; then
     log "rtk hook (claude)"
     rtk init -g --hook-only --auto-patch >/dev/null || warn "rtk init failed"
   fi
