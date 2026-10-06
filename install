@@ -404,7 +404,8 @@ CLAUDE_PLUGINS=(
 )
 
 # Plugin parts to hide (Claude can't disable single plugin components).
-# Merged into ~/.claude/settings.json permissions.deny; nothing else touched.
+# Merged into ~/.claude/settings.json permissions.deny, plus empty
+# attribution (no Co-Authored-By / PR footer); nothing else touched.
 CLAUDE_DENY=(
   'Skill(caveman:cavecrew)'
   'Agent(caveman:cavecrew-builder)'
@@ -420,10 +421,16 @@ path, rules = Path(sys.argv[1]), sys.argv[2:]
 data = json.loads(path.read_text()) if path.exists() else {}
 deny = data.setdefault("permissions", {}).setdefault("deny", [])
 new = [r for r in rules if r not in deny]
+attribution = {"commit": "", "pr": ""}
+changed = bool(new) or data.get("attribution") != attribution
 if new:
     deny.extend(new)
-    path.write_text(json.dumps(data, indent=2) + "\n")
     print(f"→ claude deny: {', '.join(new)}")
+if data.get("attribution") != attribution:
+    data["attribution"] = attribution
+    print("→ claude attribution off")
+if changed:
+    path.write_text(json.dumps(data, indent=2) + "\n")
 PY2
 }
 
