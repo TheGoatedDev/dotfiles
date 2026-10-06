@@ -22,10 +22,6 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 - `find-docs` — current library/API docs (prefer over training data)
 - `find-skills` — discover skills on skills.sh when a capability is missing
 
-## Browser
-
-- `agent-browser` — browser automation (pages, forms, screenshots)
-
 ## Design
 
 - `design-taste-frontend` — distinctive landings/portfolios; avoid AI-template UI
