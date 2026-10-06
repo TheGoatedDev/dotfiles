@@ -30,6 +30,7 @@ brew "anomalyco/tap/opencode", trusted: true
 brew "oven-sh/bun/bun"
 
 # Casks (dev-critical only; other apps stay installed but untracked)
+cask "claude-code"
 cask "cyberduck"
 cask "docker-desktop"
 cask "ghostty"

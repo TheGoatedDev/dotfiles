@@ -1,6 +1,6 @@
 # dotfiles
 
-Public, idempotent macOS setup: shell configs (Stow), Homebrew (`Brewfile`), OpenCode, and agent skills (`skills.sh` + custom).
+Public, idempotent macOS setup: shell configs (Stow), Homebrew (`Brewfile`), OpenCode + Claude Code, and agent skills (`skills.sh` + custom).
 
 **Agents:** see [AGENTS.md](./AGENTS.md) for how the repo is wired.
 
@@ -32,7 +32,7 @@ Open a new shell.
 | `manifest.yaml` | Stow packages + external `skills.sh` packages |
 | `Brewfile` | Canonical Homebrew formulae/casks |
 | `skills/custom/` | Your skills (symlinked into `~/.agents/skills`) |
-| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/` | Stow packages → `$HOME` |
+| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/`, `claude/` | Stow packages → `$HOME` |
 | `install` | Idempotent apply (zsh) |
 
 ## Commands
@@ -53,7 +53,7 @@ Open a new shell.
 
 - **External:** list under `skills.packages` in `manifest.yaml`; `./install --skills-only` runs `npx skills add`.
 - **Custom:** edit under `skills/custom/<name>/`, re-run `./install --skills-only`.
-- OpenCode skills dir is fully relinked to `~/.agents/skills/*`.
+- OpenCode and Claude Code skills dirs are relinked to `~/.agents/skills/*`.
 
 Skills on disk but not in `manifest.yaml` stay unmanaged until you add them there.
 

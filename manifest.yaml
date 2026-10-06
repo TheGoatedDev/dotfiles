@@ -7,6 +7,7 @@ stow:
   - ghostty
   - opencode
   - tmux
+  - claude
 
 zsh_plugins:
   dir: ~/.zsh/plugins
@@ -26,6 +27,7 @@ skills:
   custom_dir: skills/custom
   agents_dir: ~/.agents/skills
   opencode_skills_dir: ~/.config/opencode/skills
+  claude_skills_dir: ~/.claude/skills
   # skills.sh packages (source → skill names). Edit here; ./install --skills-only
   packages:
     JuliusBrussee/caveman:

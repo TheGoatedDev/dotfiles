@@ -18,7 +18,7 @@ Usage: ./install [options]
   --reinstall         brew reinstall Brewfile formulae only (no casks / no sudo)
   --reinstall-casks   brew reinstall Brewfile casks only (Terminal + sudo -v)
   --check             Report drift only (no changes)
-  --skills-only       Skills + opencode skill links only
+  --skills-only       Skills + opencode/claude skill links only
   --strict            Fail if secrets file missing
   -h, --help          This help
 EOF
@@ -48,7 +48,7 @@ expand_path() {
   print -r -- "${p:A}"
 }
 
-STOW_PACKAGES=(zsh git ghostty opencode tmux)
+STOW_PACKAGES=(zsh git ghostty opencode tmux claude)
 ZSH_PLUGINS_DIR="$(expand_path ~/.zsh/plugins)"
 ZSH_PLUGIN_REPOS=(
   https://github.com/zsh-users/zsh-autosuggestions
@@ -65,6 +65,7 @@ CUSTOM_SKILLS_DIR="$REPO/skills/custom"
 AGENTS_SKILLS_DIR="$(expand_path ~/.agents/skills)"
 OPENCODE_SKILLS_DIR="$(expand_path ~/.config/opencode/skills)"
 OPENCODE_DIR="$(expand_path ~/.config/opencode)"
+CLAUDE_SKILLS_DIR="$(expand_path ~/.claude/skills)"
 SECRETS_PATH="$(expand_path ~/.config/secrets/env)"
 BREWFILE="$REPO/Brewfile"
 BACKUP_ROOT="$(expand_path ~/.dotfiles-backup)/$(date +%Y%m%d-%H%M%S)"
@@ -366,6 +367,96 @@ link_custom_skills() {
   done
 }
 
+# Skills a Claude plugin already ships (avoid duplicates).
+CLAUDE_SKILLS_SKIP=(caveman)
+
+# Claude Code: link ~/.agents/skills/* into ~/.claude/skills. Only manages links;
+# Claude's own dirs (e.g. synced/) are left alone.
+relink_claude_skills() {
+  mkdir -p "$CLAUDE_SKILLS_DIR"
+  local f s name
+  for f in "$CLAUDE_SKILLS_DIR"/*(N@); do
+    rm -f "$f"
+  done
+  for s in "$AGENTS_SKILLS_DIR"/*(N-/); do
+    name="${s:t}"
+    (( ${CLAUDE_SKILLS_SKIP[(Ie)$name]} )) && continue
+    if [[ -e "$CLAUDE_SKILLS_DIR/$name" ]]; then
+      warn "skip non-link in claude skills: $CLAUDE_SKILLS_DIR/$name"
+      continue
+    fi
+    ln -s "$s" "$CLAUDE_SKILLS_DIR/$name"
+  done
+  log "claude skills linked ($(find "$CLAUDE_SKILLS_DIR" -maxdepth 1 -type l | wc -l | tr -d ' '))"
+}
+
+# Mirrors opencode.json "mcp" (remote servers) at Claude user scope.
+CLAUDE_MCP_SERVERS=(
+  exa     https://mcp.exa.ai/mcp
+  linear  https://mcp.linear.app/mcp
+  posthog https://mcp.posthog.com/mcp
+)
+
+# Claude plugins: marketplace name, source (pin with #tag), plugin name.
+CLAUDE_PLUGINS=(
+  caveman 'https://github.com/JuliusBrussee/caveman.git#v3.1.0' caveman
+)
+
+# Plugin parts to hide (Claude can't disable single plugin components).
+# Merged into ~/.claude/settings.json permissions.deny; nothing else touched.
+CLAUDE_DENY=(
+  'Skill(caveman:cavecrew)'
+  'Agent(caveman:cavecrew-builder)'
+  'Agent(caveman:cavecrew-investigator)'
+  'Agent(caveman:cavecrew-reviewer)'
+)
+
+claude_deny_rules() {
+  python3 - "$HOME_DIR/.claude/settings.json" "${CLAUDE_DENY[@]}" <<'PY2' || warn "claude deny rules failed"
+import json, sys
+from pathlib import Path
+path, rules = Path(sys.argv[1]), sys.argv[2:]
+data = json.loads(path.read_text()) if path.exists() else {}
+deny = data.setdefault("permissions", {}).setdefault("deny", [])
+new = [r for r in rules if r not in deny]
+if new:
+    deny.extend(new)
+    path.write_text(json.dumps(data, indent=2) + "\n")
+    print(f"→ claude deny: {', '.join(new)}")
+PY2
+}
+
+claude_setup() {
+  if ! command -v claude >/dev/null 2>&1; then
+    warn "claude not found; skip Claude Code MCP/hook setup"
+    return 0
+  fi
+  local name url
+  for name url in "${CLAUDE_MCP_SERVERS[@]}"; do
+    claude mcp get "$name" >/dev/null 2>&1 && continue
+    log "claude mcp add $name"
+    claude mcp add -s user -t http "$name" "$url" >/dev/null || warn "claude mcp add failed: $name"
+  done
+  # Claude plugins: marketplace (git URL pinned with #ref) + plugin@marketplace.
+  # caveman: always-on via SessionStart hook (OpenCode uses opencode-caveman).
+  local market ref plugin
+  for market ref plugin in "${CLAUDE_PLUGINS[@]}"; do
+    if ! claude plugin marketplace list 2>/dev/null | grep -q "❯ $market\$"; then
+      log "claude marketplace add $market ($ref)"
+      claude plugin marketplace add "$ref" >/dev/null || { warn "marketplace add failed: $market"; continue; }
+    fi
+    claude plugin list 2>/dev/null | grep -q "❯ $plugin@$market\$" && continue
+    log "claude plugin install $plugin@$market"
+    claude plugin install "$plugin@$market" >/dev/null || warn "plugin install failed: $plugin@$market"
+  done
+  claude_deny_rules
+  # RTK hook in ~/.claude/settings.json (OpenCode gets plugins/rtk.ts instead)
+  if command -v rtk >/dev/null 2>&1 && ! rtk init --show 2>/dev/null | grep -q '^\[ok\] Hook'; then
+    log "rtk hook (claude)"
+    rtk init -g --hook-only --auto-patch >/dev/null || warn "rtk init failed"
+  fi
+}
+
 relink_opencode_skills() {
   mkdir -p "$OPENCODE_SKILLS_DIR" "$AGENTS_SKILLS_DIR"
   # remove managed links / empty; keep unknown non-links only with --force wipe of links
@@ -453,11 +544,13 @@ if (( ! SKILLS_ONLY )); then
   done
   check_secrets
   opencode_pnpm
+  claude_setup
 fi
 
 install_skills_external
 link_custom_skills
 relink_opencode_skills
+relink_claude_skills
 
 log "done"
 if [[ ! -f "$SECRETS_PATH" || ! -f "$HOME_DIR/.gitconfig.local" ]]; then

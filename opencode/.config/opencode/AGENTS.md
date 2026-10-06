@@ -1,11 +1,11 @@
 # Skills
 
-Load the matching skill when the task fits. Skills live under `~/.agents/skills` (linked into OpenCode).
+Load the matching skill when the task fits. Skills live under `~/.agents/skills` (linked into OpenCode and Claude Code).
 Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.packages` + `skills/custom/*`. Keep this list matched when those change.
 
 ## Process
 
-- `caveman` — terse compressed communication (also always-on via `opencode-caveman` plugin; `/caveman lite|full|ultra|off`)
+- `caveman` — terse compressed communication (also always-on via `opencode-caveman` plugin / Claude `caveman@caveman`; `/caveman lite|full|ultra|off`)
 - `grill-me` — relentless design interview until decisions lock
 - `grilling` — stress-test a plan/decision/idea (mattpocock grill triggers)
 - `grill-with-docs` — design interview while writing ADRs/glossary
