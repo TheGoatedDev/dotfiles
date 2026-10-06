@@ -38,7 +38,9 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 
 # Policy
 
+- Confirmed bug → failing test that reproduces it, then the fix. No fix without that test.
 - Atomic commits when a unit of work is done; do not wait to be asked.
 - Narrow edits; follow project conventions; never commit secrets or `.env`.
-- Web search → Exa MCP only (built-in `websearch` off). Fetch URLs → built-in `webfetch`.
+- Unknown local files/symbols → Task `explore`. Library/docs/web → Task `scout`. Skip if path already known.
+- Primary must not Exa or webfetch. Web/docs → Task `scout` (Exa + webfetch + ctx7). Built-in `websearch` off.
 - Dotfiles repo is source of truth for stowed config; apply with `./install`. Do not hand-edit stowed `$HOME` targets.

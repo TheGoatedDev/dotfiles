@@ -1,12 +1,22 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "model": "xai/grok-4.6",
+  "small_model": "opencode/ling-3.0-flash-fin-free",
+  "disabled_providers": ["openai"],
   "lsp": true,
   "formatter": true,
   "compaction": { "auto": true, "prune": true, "tail_turns": 8 },
   "tool_output": { "max_lines": 400, "max_bytes": 16384 },
   "tools": {
     "websearch": false,
-    "webfetch": true
+    "webfetch": false
+  },
+  "permission": {
+    "skill": {
+      "find-docs": "deny"
+    },
+    "webfetch": "deny",
+    "exa_*": "deny"
   },
   "agent": {
     "explore": {
