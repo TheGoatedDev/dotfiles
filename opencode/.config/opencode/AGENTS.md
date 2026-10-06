@@ -6,7 +6,6 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 ## Process
 
 - `caveman` — terse compressed communication (also always-on via `opencode-caveman` plugin / Claude `caveman@caveman`; `/caveman lite|full|ultra|off`)
-- `grill-me` — relentless design interview until decisions lock
 - `grilling` — stress-test a plan/decision/idea (mattpocock grill triggers)
 - `grill-with-docs` — design interview while writing ADRs/glossary
 - `domain-modeling` — sharpen domain model; CONTEXT.md + ADRs
