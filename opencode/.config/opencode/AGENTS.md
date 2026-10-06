@@ -13,6 +13,10 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 - `tropes-fyi` — human prose; avoid AI-writing tells
 - `ponytail` — laziest solution that works (plugin `@dietrichgebert/ponytail`; `/ponytail lite|full|ultra`)
 
+## Secrets
+
+- `proton-pass` — Proton Pass via `pass-cli` (`run`/`inject`/`pass://`; never dump secrets)
+
 ## Docs / discovery
 
 - `find-docs` — current library/API docs (prefer over training data)
