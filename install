@@ -394,7 +394,6 @@ relink_claude_skills() {
 
 # Mirrors opencode.json "mcp" (remote servers) at Claude user scope.
 CLAUDE_MCP_SERVERS=(
-  exa     https://mcp.exa.ai/mcp
   posthog https://mcp.posthog.com/mcp
 )
 

@@ -7,16 +7,12 @@
   "formatter": true,
   "compaction": { "auto": true, "prune": true, "tail_turns": 8 },
   "tool_output": { "max_lines": 400, "max_bytes": 16384 },
-  "tools": {
-    "websearch": false,
-    "webfetch": false
-  },
   "permission": {
     "skill": {
       "find-docs": "deny"
     },
-    "webfetch": "deny",
-    "exa_*": "deny"
+    "websearch": "deny",
+    "webfetch": "deny"
   },
   "agent": {
     "explore": {
@@ -26,21 +22,21 @@
       "permission": {
         "edit": "deny",
         "bash": "deny",
+        "websearch": "deny",
         "webfetch": "deny",
-        "exa_*": "deny",
         "skill": {
           "find-docs": "deny"
         }
       }
     },
     "scout": {
-      "description": "Use for library/API docs, upstream deps, and web research. ctx7 CLI (find-docs), Exa, webfetch. Primary MUST Task scout instead of guessing APIs or searching the web.",
+      "description": "Use for library/API docs, upstream deps, and web research. ctx7 CLI (find-docs), websearch, webfetch. Primary MUST Task scout instead of guessing APIs or searching the web.",
       "mode": "subagent",
       "model": "opencode/muse-spark-1.3-contributor-free",
       "permission": {
         "edit": "deny",
+        "websearch": "allow",
         "webfetch": "allow",
-        "exa_*": "allow",
         "skill": {
           "find-docs": "allow"
         },
@@ -53,11 +49,6 @@
     }
   },
   "mcp": {
-    "exa": {
-      "type": "remote",
-      "url": "https://mcp.exa.ai/mcp",
-      "enabled": true
-    },
     "posthog": {
       "type": "remote",
       "url": "https://mcp.posthog.com/mcp"

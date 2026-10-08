@@ -41,5 +41,5 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 - Atomic commits when a unit of work is done; do not wait to be asked.
 - Narrow edits; follow project conventions; never commit secrets or `.env`.
 - Unknown local files/symbols → Task `explore`. Library/docs/web → Task `scout`. Skip if path already known.
-- Primary must not Exa or webfetch. Web/docs → Task `scout` (Exa + webfetch + ctx7). Built-in `websearch` off.
+- Primary must not websearch or webfetch. Web/docs → Task `scout` (websearch + webfetch + ctx7).
 - Dotfiles repo is source of truth for stowed config; apply with `./install`. Do not hand-edit stowed `$HOME` targets.

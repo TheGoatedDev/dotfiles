@@ -6,5 +6,5 @@ The skill index and policy above are shared with OpenCode. Read them with these 
 
 - Task `explore` → built-in `Explore` agent.
 - Task `scout` → `scout` agent (`~/.claude/agents/scout.md`).
-- Exa / webfetch / `websearch` rules also cover `WebSearch`, `WebFetch` and `mcp__exa__*`: primary delegates them to `scout`.
+- `websearch` / `webfetch` rules cover `WebSearch` and `WebFetch`: primary delegates them to `scout`.
 - `ponytail` comes from the `ponytail@ponytail` Claude plugin (always-on; `/ponytail lite|full|ultra|off`). `caveman` comes from the `caveman@caveman` Claude plugin (always-on; `/caveman lite|full|ultra`, `stop caveman`).
