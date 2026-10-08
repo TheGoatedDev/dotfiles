@@ -90,8 +90,8 @@ Rough order (full install):
 
 - **Shell:** zsh; plugins via git clones (not full Oh My Zsh).
 - **Agents:** OpenCode (primary) and Claude Code share skills (`~/.agents/skills`), the skill index/policy, subagents (explore/scout) and MCP servers. No Codex.
-- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`; its `caveman` skill replaces the `~/.agents/skills` link (`CLAUDE_SKILLS_SKIP`). Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
-- **OpenCode-only:** ponytail plugin, per-agent permission denies. Claude Code cannot deny tools to the primary only, so the delegation rules are instruction-only there.
+- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`; its `caveman` skill replaces the `~/.agents/skills` link (`CLAUDE_SKILLS_SKIP`). Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
+- **OpenCode-only:** per-agent permission denies. Claude Code cannot deny tools to the primary only, so the delegation rules are instruction-only there.
 - **Docs lookup:** `find-docs` skill (`ctx7` CLI); Context7 is not an MCP server here.
 - **Web:** built-in `websearch` off; **Exa MCP** for search; built-in `webfetch` for URLs.
 - **Plugins (npm, pinned in opencode.json):** `@dietrichgebert/ponytail`, `opencode-caveman`.

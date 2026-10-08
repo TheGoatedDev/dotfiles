@@ -401,6 +401,7 @@ CLAUDE_MCP_SERVERS=(
 # Claude plugins: marketplace name, source (pin with #tag), plugin name.
 CLAUDE_PLUGINS=(
   caveman 'https://github.com/JuliusBrussee/caveman.git#v3.1.0' caveman
+  ponytail 'https://github.com/DietrichGebert/ponytail.git#v5.1.0' ponytail
 )
 
 # Plugin parts to hide (Claude can't disable single plugin components).
