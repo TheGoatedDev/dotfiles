@@ -39,7 +39,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `ghostty` | `~/.config/ghostty/config` |
 | `opencode` | `~/.config/opencode/*` (json, AGENTS.md, plugins, package.json). No stowed `.gitignore` — pnpm may write lockfiles/local ignores under that dir. |
 | `tmux` | `~/.config/tmux/tmux.conf`. TPM plugins cloned by install into `~/.config/tmux/plugins/` (not stowed). |
-| `claude` | `~/.claude/CLAUDE.md` (imports the OpenCode AGENTS.md + tool mapping), `~/.claude/agents/*`. `settings.json` is **not** stowed (Claude writes to it). |
+| `claude` | `~/.claude/CLAUDE.md` (imports the OpenCode AGENTS.md + tool mapping). `settings.json` is **not** stowed (Claude writes to it). |
 
 Skills are not stowed as trees: install rebuilds `~/.config/opencode/skills/*` and `~/.claude/skills/*` → `~/.agents/skills/*` (Claude: links only; its own dirs like `synced/` are left alone).
 
@@ -53,7 +53,7 @@ Skills are not stowed as trees: install rebuilds `~/.config/opencode/skills/*` a
 | Git identity | `~/.gitconfig.local`. Tracked `.gitconfig` is scrubbed + `include`s local. |
 | OpenCode config / plugins list | Edit `opencode/.config/opencode/opencode.json`. Pin plugins with `@pkg@version`. |
 | OpenCode skill index | Edit `opencode/.config/opencode/AGENTS.md` (stowed → `$HOME/.config/opencode/AGENTS.md`). Skills list only — see below. Claude Code imports it via `~/.claude/CLAUDE.md`. |
-| Claude Code instructions / subagents | `claude/.claude/CLAUDE.md` (tool mapping only), `claude/.claude/agents/*.md`. Keep subagents in step with `opencode.json` `agent`. |
+| Claude Code instructions | `claude/.claude/CLAUDE.md` (tool mapping only). |
 | MCP servers | `opencode.json` `mcp` **and** `CLAUDE_MCP_SERVERS` in `install` (registered with `claude mcp add -s user`). |
 | Local OpenCode plugin file | `opencode/.config/opencode/plugins/*.ts`, then `./install` (runs `pnpm install` in config dir). |
 | Homebrew set | Edit `Brewfile` only. `brew bundle --no-upgrade` via install. Leaving something out of the Brewfile does **not** uninstall it. |
@@ -89,11 +89,11 @@ Rough order (full install):
 ## Stack assumptions
 
 - **Shell:** zsh; plugins via git clones (not full Oh My Zsh).
-- **Agents:** OpenCode (primary) and Claude Code share skills (`~/.agents/skills`), the skill index/policy, subagents (explore/scout) and MCP servers. No Codex.
-- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`; its `caveman` skill replaces the `~/.agents/skills` link (`CLAUDE_SKILLS_SKIP`). Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
+- **Agents:** OpenCode (primary) and Claude Code share skills (`~/.agents/skills`), the skill index/policy, the explore subagent (Claude: built-in `Explore`) and MCP servers. No Codex.
+- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`. The caveman plugin's `caveman` skill replaces the `~/.agents/skills` link (`CLAUDE_SKILLS_SKIP`). Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
 - **OpenCode-only:** per-agent permission denies. Claude Code cannot deny tools to the primary only, so the delegation rules are instruction-only there.
 - **Docs lookup:** `find-docs` skill (`ctx7` CLI); Context7 is not an MCP server here.
-- **Web:** built-in `websearch` for search, built-in `webfetch` for URLs (scout only; primary denied).
+- **Web:** built-in `websearch` for search, built-in `webfetch` for URLs.
 - **Plugins (npm, pinned in opencode.json):** `@dietrichgebert/ponytail`, `opencode-caveman`.
 
 ## Public / safety
