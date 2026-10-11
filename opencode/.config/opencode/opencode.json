@@ -27,6 +27,10 @@
     "posthog": {
       "type": "remote",
       "url": "https://mcp.posthog.com/mcp"
+    },
+    "vercel": {
+      "type": "remote",
+      "url": "https://mcp.vercel.com"
     }
   },
   "plugin": [

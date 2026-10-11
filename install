@@ -395,6 +395,7 @@ relink_claude_skills() {
 # Mirrors opencode.json "mcp" (remote servers) at Claude user scope.
 CLAUDE_MCP_SERVERS=(
   posthog https://mcp.posthog.com/mcp
+  vercel  https://mcp.vercel.com
 )
 
 # Claude plugins: marketplace name, source (pin with #tag), plugin name.
