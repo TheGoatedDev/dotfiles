@@ -24,7 +24,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `install` | Idempotent apply (zsh). Main entrypoint. |
 | `manifest.yaml` | Stow packages + [skills.sh](https://skills.sh) package list (`skills.packages`). |
 | `Brewfile` | Canonical Homebrew formulae/casks/vscode extensions to **ensure**. Does not uninstall extras on the machine. |
-| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/`, `claude/` | Stow packages → `$HOME` (mirror home-relative paths). |
+| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/`, `claude/`, `launchd/` | Stow packages → `$HOME` (mirror home-relative paths). |
 | `skills/custom/` | First-party skills; install symlinks into `~/.agents/skills/`. |
 | `env.example` | Template → `~/.config/secrets/env` (chmod 600). |
 | `gitconfig.local.example` | Template → `~/.gitconfig.local` (name/email/signing). |
@@ -40,6 +40,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `opencode` | `~/.config/opencode/*` (json, AGENTS.md, plugins, package.json). No stowed `.gitignore` — pnpm may write lockfiles/local ignores under that dir. |
 | `tmux` | `~/.config/tmux/tmux.conf`. TPM plugins cloned by install into `~/.config/tmux/plugins/` (not stowed). |
 | `claude` | `~/.claude/CLAUDE.md` (imports the OpenCode AGENTS.md + tool mapping). `settings.json` is **not** stowed (Claude writes to it). |
+| `launchd` | `~/Library/LaunchAgents/com.tom.proton-pass-ssh-agent.plist` (Proton Pass SSH agent, all vaults → `~/.ssh/proton-pass-agent.sock`). Install bootstraps unloaded agents. Needs `pass-cli login`. |
 
 Skills are not stowed as trees: install rebuilds `~/.config/opencode/skills/*` and `~/.claude/skills/*` → `~/.agents/skills/*` (Claude: links only; its own dirs like `synced/` are left alone).
 

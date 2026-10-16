@@ -32,7 +32,7 @@ Open a new shell.
 | `manifest.yaml` | Stow packages + external `skills.sh` packages |
 | `Brewfile` | Canonical Homebrew formulae/casks |
 | `skills/custom/` | Your skills (symlinked into `~/.agents/skills`) |
-| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/`, `claude/` | Stow packages → `$HOME` |
+| `zsh/`, `git/`, `ghostty/`, `opencode/`, `tmux/`, `claude/`, `launchd/` | Stow packages → `$HOME` |
 | `install` | Idempotent apply (zsh) |
 
 ## Commands

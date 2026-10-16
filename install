@@ -48,7 +48,7 @@ expand_path() {
   print -r -- "${p:A}"
 }
 
-STOW_PACKAGES=(zsh git ghostty opencode tmux claude)
+STOW_PACKAGES=(zsh git ghostty opencode tmux claude launchd)
 ZSH_PLUGINS_DIR="$(expand_path ~/.zsh/plugins)"
 ZSH_PLUGIN_REPOS=(
   https://github.com/zsh-users/zsh-autosuggestions
@@ -527,6 +527,17 @@ opencode_pnpm() {
   fi
 }
 
+# Load stowed LaunchAgents not yet in launchd (already-loaded left alone)
+load_launch_agents() {
+  local plist label
+  for plist in "$REPO"/launchd/Library/LaunchAgents/*.plist(N); do
+    label="${plist:t:r}"
+    launchctl print "gui/$UID/$label" >/dev/null 2>&1 && continue
+    log "launchctl bootstrap $label"
+    launchctl bootstrap "gui/$UID" "$HOME_DIR/Library/LaunchAgents/${plist:t}" || warn "bootstrap failed: $label"
+  done
+}
+
 check_drift() {
   log "check mode"
   local pkg
@@ -554,6 +565,7 @@ if (( ! SKILLS_ONLY )); then
   for pkg in "${STOW_PACKAGES[@]}"; do
     stow_package "$pkg"
   done
+  load_launch_agents
   check_secrets
   opencode_pnpm
   claude_setup

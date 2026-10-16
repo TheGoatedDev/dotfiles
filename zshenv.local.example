@@ -1,2 +1,3 @@
 # Copy to $HOME/.zshenv.local (not tracked)
 # Machine-specific env only — keep out of git.
+# export SSH_AUTH_SOCK="$HOME/.ssh/proton-pass-agent.sock"  # launchd/ Proton Pass agent

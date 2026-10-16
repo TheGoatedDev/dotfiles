@@ -8,6 +8,7 @@ stow:
   - opencode
   - tmux
   - claude
+  - launchd
 
 zsh_plugins:
   dir: ~/.zsh/plugins
