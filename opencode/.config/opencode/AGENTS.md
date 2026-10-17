@@ -9,7 +9,6 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 - `grilling` — stress-test a plan/decision/idea (mattpocock grill triggers)
 - `grill-with-docs` — design interview while writing ADRs/glossary
 - `domain-modeling` — sharpen domain model; CONTEXT.md + ADRs
-- `tropes-fyi` — human prose; avoid AI-writing tells
 - `writing-whip` — kill AI writing tropes/behaviours at generation; replies, docs, outbound copy (tropes.fyi/whip)
 - `ponytail` — laziest solution that works (OpenCode plugin `@dietrichgebert/ponytail`, Claude plugin `ponytail@ponytail`; `/ponytail lite|full|ultra|off`)
 
