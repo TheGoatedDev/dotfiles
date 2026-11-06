@@ -36,6 +36,11 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 
 - `posthog:*` — PostHog analytics, flags, experiments, errors (Claude plugin `posthog@claude-plugins-official`; bundles PostHog MCP)
 
+## Reverse engineering / automation
+
+- `rea:reverse-engineer-anything` — binaries, packages, Electron, firmware, browser targets (Claude plugin `rea@rea` + `rea` MCP from install)
+- `agent-desktop` — drive native desktop apps via the `agent-desktop` CLI (snapshot, click, type)
+
 ## Accessibility
 
 - `wcag-audit` — WCAG 2.2 AA page/HTML audit + contrast numbers (static; published eval)

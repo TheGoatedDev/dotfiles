@@ -43,6 +43,8 @@ skills:
       - turborepo
     shadcn-ui/ui:
       - shadcn
+    vercel-labs/agent-desktop:
+      - agent-desktop
     vercel-labs/agent-skills:
       - web-design-guidelines
     CFLW-AI/wcag-audit-claude-skill:

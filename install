@@ -393,6 +393,8 @@ CLAUDE_PLUGINS=(
   caveman 'https://github.com/JuliusBrussee/caveman.git#v3.1.0' caveman
   ponytail 'https://github.com/DietrichGebert/ponytail.git#v5.1.0' ponytail
   impeccable 'https://github.com/pbakaus/impeccable.git#skill-v4.8.0' impeccable
+  # rea: tags lack .claude-plugin/ and #ref can't be a SHA; main's marketplace.json pins npm rea-agents
+  rea 'https://github.com/morluto/rea.git' rea
   claude-plugins-official anthropics/claude-plugins-official posthog
 )
 
@@ -447,6 +449,11 @@ claude_setup() {
     log "claude plugin install $plugin@$market"
     claude plugin install "$plugin@$market" >/dev/null || warn "plugin install failed: $plugin@$market"
   done
+  # shortcut: npm rea-agents@6.8.0 lacks .claude-plugin/plugin.json, so rea@rea brings only the skill; drop once a release ships it.
+  if ! claude mcp get rea >/dev/null 2>&1; then
+    log "claude mcp add rea"
+    claude mcp add -s user rea -- npx -y rea-agents@6.8.0 mcp >/dev/null || warn "claude mcp add failed: rea"
+  fi
   claude_deny_rules
   # RTK hook in ~/.claude/settings.json
   if command -v rtk >/dev/null 2>&1 && ! grep -q '^\[ok\] Hook' <<<"$(rtk init --show 2>/dev/null || true)"; then

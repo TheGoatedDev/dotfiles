@@ -3,6 +3,7 @@ tap "oven-sh/bun", trusted: true
 
 # CLI / dev
 brew "act"
+brew "agent-desktop"
 brew "cloudflare-wrangler"
 brew "cmake"
 brew "cocoapods"

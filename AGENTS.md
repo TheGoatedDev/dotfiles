@@ -53,7 +53,7 @@ Skills are not stowed as trees: install rebuilds `~/.claude/skills/*` → `~/.ag
 | Git identity | `~/.gitconfig.local`. Tracked `.gitconfig` is scrubbed + `include`s local. |
 | Skill index / policy | Edit `claude/.claude/CLAUDE.md` (stowed → `$HOME/.claude/CLAUDE.md`). Skills list only — see below. |
 | Claude plugins | `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). |
-| MCP servers | Prefer a Claude plugin that ships the server (posthog) in `CLAUDE_PLUGINS`. |
+| MCP servers | Prefer a Claude plugin that ships the server (posthog) in `CLAUDE_PLUGINS`; otherwise `claude mcp add -s user` in `claude_setup` (rea, until its npm release ships the plugin manifest). |
 | Homebrew set | Edit `Brewfile` only. `brew bundle --no-upgrade` via install. Leaving something out of the Brewfile does **not** uninstall it. |
 | External skill | Add under `skills.packages` in `manifest.yaml` (`source: [name, …]`), then `./install --skills-only`. |
 | Custom skill | Add `skills/custom/<name>/SKILL.md`, `./install --skills-only`. |
@@ -87,7 +87,7 @@ Rough order (full install):
 
 - **Shell:** zsh; plugins via git clones (not full Oh My Zsh).
 - **Agent:** Claude Code only. Skills in `~/.agents/skills`, explore via built-in `Explore`. No OpenCode, no Codex.
-- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`; `impeccable@impeccable`; `posthog` from `claude-plugins-official` (SHA-pinned upstream, brings its MCP server). Prefer a plugin over a skills.sh package when it ships only what you want. The `caveman` skill comes from the plugin, not `skills.packages`. Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
+- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`; `impeccable@impeccable`; `posthog` from `claude-plugins-official` (SHA-pinned upstream, brings its MCP server); `rea@rea` from `main` (tags lack `.claude-plugin/`; marketplace.json pins the npm version) gives the skill; `install` adds the `rea` MCP pinned to the same npm version (Hopper auto-found in `~/Applications`). Prefer a plugin over a skills.sh package when it ships only what you want. The `caveman` skill comes from the plugin, not `skills.packages`. Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
 - **Docs lookup:** `find-docs` skill (`ctx7` CLI); Context7 is not an MCP server here.
 - **Web:** built-in `websearch` for search, built-in `webfetch` for URLs.
 
