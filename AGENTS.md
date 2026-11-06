@@ -53,7 +53,7 @@ Skills are not stowed as trees: install rebuilds `~/.claude/skills/*` → `~/.ag
 | Git identity | `~/.gitconfig.local`. Tracked `.gitconfig` is scrubbed + `include`s local. |
 | Skill index / policy | Edit `claude/.claude/CLAUDE.md` (stowed → `$HOME/.claude/CLAUDE.md`). Skills list only — see below. |
 | Claude plugins | `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). |
-| MCP servers | `CLAUDE_MCP_SERVERS` in `install` (registered with `claude mcp add -s user`). |
+| MCP servers | Prefer a Claude plugin that ships the server (posthog, vercel) in `CLAUDE_PLUGINS`. |
 | Homebrew set | Edit `Brewfile` only. `brew bundle --no-upgrade` via install. Leaving something out of the Brewfile does **not** uninstall it. |
 | External skill | Add under `skills.packages` in `manifest.yaml` (`source: [name, …]`), then `./install --skills-only`. |
 | Custom skill | Add `skills/custom/<name>/SKILL.md`, `./install --skills-only`. |
@@ -78,7 +78,7 @@ Rough order (full install):
 2. Ensure `stow`; clone/update zsh plugins under `~/.zsh/plugins` and tmux plugins under `~/.config/tmux/plugins`
 3. Stow each package in `manifest.yaml`
 4. Warn/check secrets file
-5. Register Claude MCP servers + plugins; deny rules; RTK Claude hook (`rtk init -g --hook-only`)
+5. Register Claude plugins (incl. their MCP servers); deny rules; RTK Claude hook (`rtk init -g --hook-only`)
 6. External skills from `manifest.yaml` `skills.packages` (`-a claude-code`; skip if already present)
 7. Symlink `skills/custom/*` → `~/.agents/skills/`
 8. Relink `~/.claude/skills/` → `~/.agents/skills/`
@@ -87,7 +87,7 @@ Rough order (full install):
 
 - **Shell:** zsh; plugins via git clones (not full Oh My Zsh).
 - **Agent:** Claude Code only. Skills in `~/.agents/skills`, explore via built-in `Explore`. No OpenCode, no Codex.
-- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`. The `caveman` skill comes from the plugin, not `skills.packages`. Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
+- **Claude plugins:** `CLAUDE_PLUGINS` in `install` (marketplace git URL pinned with `#tag`). caveman always-on via `caveman@caveman`, ponytail always-on via `ponytail@ponytail`; `impeccable@impeccable`; `posthog` and `vercel` from `claude-plugins-official` (SHA-pinned upstream, bring their MCP servers). Prefer a plugin over a skills.sh package when it ships only what you want. The `caveman` skill comes from the plugin, not `skills.packages`. Unwanted plugin parts (cavecrew) are hidden via `CLAUDE_DENY` → `permissions.deny` merged into `~/.claude/settings.json`; same merge sets empty `attribution` (no Claude co-author/PR footer).
 - **Docs lookup:** `find-docs` skill (`ctx7` CLI); Context7 is not an MCP server here.
 - **Web:** built-in `websearch` for search, built-in `webfetch` for URLs.
 

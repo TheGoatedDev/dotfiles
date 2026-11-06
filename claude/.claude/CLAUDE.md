@@ -1,7 +1,7 @@
 # Skills
 
 Load the matching skill when the task fits. Skills live under `~/.agents/skills` (linked into `~/.claude/skills`).
-Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.packages` + `skills/custom/*` + `CLAUDE_PLUGINS` in `install`. Keep this list matched when those change.
+Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.packages` + `skills/custom/*` + `CLAUDE_PLUGINS` in `install` (plugin skills are namespaced `plugin:skill`). Keep this list matched when those change.
 
 ## Process
 
@@ -24,8 +24,13 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 ## Design
 
 - `design-taste-frontend` — distinctive landings/portfolios; avoid AI-template UI
-- `impeccable` — design craft (`/impeccable polish|audit|critique|…`); PRODUCT.md/DESIGN.md
+- `impeccable` — design craft (Claude plugin `impeccable@impeccable`; `/impeccable polish|audit|critique|…`); PRODUCT.md/DESIGN.md
 - `web-design-guidelines` — audit UI vs Vercel Web Interface Guidelines
+
+## Platforms
+
+- `posthog:*` — PostHog analytics, flags, experiments, errors (Claude plugin `posthog@claude-plugins-official`; bundles PostHog MCP)
+- `vercel:*` — Vercel deploys, CLI, SDKs, platform (Claude plugin `vercel@claude-plugins-official`; bundles Vercel MCP)
 
 ## Accessibility
 

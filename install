@@ -386,16 +386,14 @@ relink_claude_skills() {
   log "claude skills linked ($(find "$CLAUDE_SKILLS_DIR" -maxdepth 1 -type l | wc -l | tr -d ' '))"
 }
 
-# Remote MCP servers, registered at Claude user scope.
-CLAUDE_MCP_SERVERS=(
-  posthog https://mcp.posthog.com/mcp
-  vercel  https://mcp.vercel.com
-)
-
 # Claude plugins: marketplace name, source (pin with #tag), plugin name.
+# posthog/vercel ship their MCP servers; the official marketplace pins them by SHA.
 CLAUDE_PLUGINS=(
   caveman 'https://github.com/JuliusBrussee/caveman.git#v3.1.0' caveman
   ponytail 'https://github.com/DietrichGebert/ponytail.git#v5.1.0' ponytail
+  impeccable 'https://github.com/pbakaus/impeccable.git#skill-v4.8.0' impeccable
+  claude-plugins-official anthropics/claude-plugins-official posthog
+  claude-plugins-official anthropics/claude-plugins-official vercel
 )
 
 # Plugin parts to hide (Claude can't disable single plugin components).
@@ -431,15 +429,9 @@ PY2
 
 claude_setup() {
   if ! command -v claude >/dev/null 2>&1; then
-    warn "claude not found; skip Claude Code MCP/hook setup"
+    warn "claude not found; skip Claude Code plugin/hook setup"
     return 0
   fi
-  local name url
-  for name url in "${CLAUDE_MCP_SERVERS[@]}"; do
-    claude mcp get "$name" >/dev/null 2>&1 && continue
-    log "claude mcp add $name"
-    claude mcp add -s user -t http "$name" "$url" >/dev/null || warn "claude mcp add failed: $name"
-  done
   # Claude plugins: marketplace (git URL pinned with #ref) + plugin@marketplace.
   # caveman: always-on via SessionStart hook.
   # capture first: grep -q + pipefail would SIGPIPE the producer
