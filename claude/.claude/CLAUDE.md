@@ -23,7 +23,6 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 
 ## Design
 
-- `design-taste-frontend` — distinctive landings/portfolios; avoid AI-template UI
 - `impeccable` — design craft (Claude plugin `impeccable@impeccable`; `/impeccable polish|audit|critique|…`); PRODUCT.md/DESIGN.md
 - `web-design-guidelines` — audit UI vs Vercel Web Interface Guidelines
 

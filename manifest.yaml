@@ -37,8 +37,6 @@ skills:
       - find-docs
     vercel-labs/skills:
       - find-skills
-    leonxlnx/taste-skill:
-      - design-taste-frontend
     vercel-labs/agent-skills:
       - web-design-guidelines
     CFLW-AI/wcag-audit-claude-skill:
