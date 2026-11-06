@@ -21,6 +21,12 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 - `find-docs` — current library/API docs (prefer over training data)
 - `find-skills` — discover skills on skills.sh when a capability is missing
 
+## JS / tooling
+
+- `pnpm` — pnpm workspaces, catalogs, filters, CLI usage
+- `turborepo` — Turborepo tasks, caching, monorepo config
+- `shadcn` — add, search, compose shadcn/ui components and registries
+
 ## Design
 
 - `impeccable` — design craft (Claude plugin `impeccable@impeccable`; `/impeccable polish|audit|critique|…`); PRODUCT.md/DESIGN.md

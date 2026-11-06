@@ -37,6 +37,12 @@ skills:
       - find-docs
     vercel-labs/skills:
       - find-skills
+    antfu/skills:
+      - pnpm
+    vercel/turborepo:
+      - turborepo
+    shadcn-ui/ui:
+      - shadcn
     vercel-labs/agent-skills:
       - web-design-guidelines
     CFLW-AI/wcag-audit-claude-skill:

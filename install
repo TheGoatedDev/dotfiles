@@ -281,12 +281,13 @@ install_skills_external() {
 
   # packages: under skills: in manifest.yaml — source → list of skill names.
   # Skip if already present. Agent: claude-code.
-  python3 - <<'PY' "$MANIFEST" "$AGENTS_SKILLS_DIR" || true
+  python3 - <<'PY' "$MANIFEST" "$AGENTS_SKILLS_DIR" "$CLAUDE_SKILLS_DIR" || true
 import re, subprocess, sys
 from pathlib import Path
 
 text = Path(sys.argv[1]).read_text()
-agents = Path(sys.argv[2])
+# skills CLI -a claude-code copies into ~/.claude/skills; older installs live in ~/.agents/skills
+dirs = [Path(d) for d in sys.argv[2:4]]
 
 # tiny indent walker for skills.packages only (no PyYAML)
 lines = text.splitlines()
@@ -332,7 +333,7 @@ if not packages:
 
 for src, names in packages.items():
     for skill in names:
-        if (agents / skill).exists():
+        if any((d / skill).exists() for d in dirs):
             print(f"→ skills skip (present): {skill}")
             continue
         cmd = [

@@ -41,7 +41,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `claude` | `~/.claude/CLAUDE.md` (skill index + policy). `settings.json` is **not** stowed (Claude writes to it). |
 | `launchd` | `~/Library/LaunchAgents/com.tom.proton-pass-ssh-agent.plist` (Proton Pass SSH agent, all vaults → `~/.ssh/proton-pass-agent.sock`). Install bootstraps unloaded agents. Needs `pass-cli login`. |
 
-Skills are not stowed as trees: install rebuilds `~/.claude/skills/*` → `~/.agents/skills/*` (links only; its own dirs like `synced/` are left alone).
+Skills are not stowed as trees: install rebuilds `~/.claude/skills/*` → `~/.agents/skills/*` (links only; its own dirs like `synced/` are left alone). `skills add -a claude-code` copies new external skills straight into `~/.claude/skills`; relink leaves those real dirs alone.
 
 ## How to change things
 
