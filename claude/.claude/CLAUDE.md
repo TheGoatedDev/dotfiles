@@ -30,7 +30,6 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 ## Platforms
 
 - `posthog:*` — PostHog analytics, flags, experiments, errors (Claude plugin `posthog@claude-plugins-official`; bundles PostHog MCP)
-- `vercel:*` — Vercel deploys, CLI, SDKs, platform (Claude plugin `vercel@claude-plugins-official`; bundles Vercel MCP)
 
 ## Accessibility
 

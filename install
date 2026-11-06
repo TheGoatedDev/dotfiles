@@ -387,13 +387,12 @@ relink_claude_skills() {
 }
 
 # Claude plugins: marketplace name, source (pin with #tag), plugin name.
-# posthog/vercel ship their MCP servers; the official marketplace pins them by SHA.
+# posthog ships its MCP server; the official marketplace pins it by SHA.
 CLAUDE_PLUGINS=(
   caveman 'https://github.com/JuliusBrussee/caveman.git#v3.1.0' caveman
   ponytail 'https://github.com/DietrichGebert/ponytail.git#v5.1.0' ponytail
   impeccable 'https://github.com/pbakaus/impeccable.git#skill-v4.8.0' impeccable
   claude-plugins-official anthropics/claude-plugins-official posthog
-  claude-plugins-official anthropics/claude-plugins-official vercel
 )
 
 # Plugin parts to hide (Claude can't disable single plugin components).
