@@ -9,6 +9,5 @@ secrets/
 **/secrets/
 *.pem
 *.key
-.opencode/
 *.log
 .cache/

@@ -18,7 +18,7 @@ Usage: ./install [options]
   --reinstall         brew reinstall Brewfile formulae only (no casks / no sudo)
   --reinstall-casks   brew reinstall Brewfile casks only (Terminal + sudo -v)
   --check             Report drift only (no changes)
-  --skills-only       Skills + opencode/claude skill links only
+  --skills-only       Skills + Claude skill links only
   --strict            Fail if secrets file missing
   -h, --help          This help
 EOF
@@ -48,7 +48,7 @@ expand_path() {
   print -r -- "${p:A}"
 }
 
-STOW_PACKAGES=(zsh git ghostty opencode tmux claude launchd)
+STOW_PACKAGES=(zsh git ghostty tmux claude launchd)
 ZSH_PLUGINS_DIR="$(expand_path ~/.zsh/plugins)"
 ZSH_PLUGIN_REPOS=(
   https://github.com/zsh-users/zsh-autosuggestions
@@ -63,8 +63,6 @@ TMUX_PLUGIN_REPOS=(
 MANIFEST="$REPO/manifest.yaml"
 CUSTOM_SKILLS_DIR="$REPO/skills/custom"
 AGENTS_SKILLS_DIR="$(expand_path ~/.agents/skills)"
-OPENCODE_SKILLS_DIR="$(expand_path ~/.config/opencode/skills)"
-OPENCODE_DIR="$(expand_path ~/.config/opencode)"
 CLAUDE_SKILLS_DIR="$(expand_path ~/.claude/skills)"
 SECRETS_PATH="$(expand_path ~/.config/secrets/env)"
 BREWFILE="$REPO/Brewfile"
@@ -282,7 +280,7 @@ install_skills_external() {
   mkdir -p "$AGENTS_SKILLS_DIR" "$HOME_DIR/.agents"
 
   # packages: under skills: in manifest.yaml — source → list of skill names.
-  # Skip if already present. Agent: opencode only.
+  # Skip if already present. Agent: claude-code.
   python3 - <<'PY' "$MANIFEST" "$AGENTS_SKILLS_DIR" || true
 import re, subprocess, sys
 from pathlib import Path
@@ -339,9 +337,9 @@ for src, names in packages.items():
             continue
         cmd = [
             "npx", "--yes", "skills", "add", src,
-            "-g", "-y", "-s", skill, "-a", "opencode",
+            "-g", "-y", "-s", skill, "-a", "claude-code",
         ]
-        print(f"→ skills add {src} -s {skill} -a opencode")
+        print(f"→ skills add {src} -s {skill} -a claude-code")
         subprocess.run(cmd, check=False)
 PY
 }
@@ -369,9 +367,6 @@ link_custom_skills() {
   done
 }
 
-# Skills a Claude plugin already ships (avoid duplicates).
-CLAUDE_SKILLS_SKIP=(caveman)
-
 # Claude Code: link ~/.agents/skills/* into ~/.claude/skills. Only manages links;
 # Claude's own dirs (e.g. synced/) are left alone.
 relink_claude_skills() {
@@ -382,7 +377,6 @@ relink_claude_skills() {
   done
   for s in "$AGENTS_SKILLS_DIR"/*(N-/); do
     name="${s:t}"
-    (( ${CLAUDE_SKILLS_SKIP[(Ie)$name]} )) && continue
     if [[ -e "$CLAUDE_SKILLS_DIR/$name" ]]; then
       warn "skip non-link in claude skills: $CLAUDE_SKILLS_DIR/$name"
       continue
@@ -392,7 +386,7 @@ relink_claude_skills() {
   log "claude skills linked ($(find "$CLAUDE_SKILLS_DIR" -maxdepth 1 -type l | wc -l | tr -d ' '))"
 }
 
-# Mirrors opencode.json "mcp" (remote servers) at Claude user scope.
+# Remote MCP servers, registered at Claude user scope.
 CLAUDE_MCP_SERVERS=(
   posthog https://mcp.posthog.com/mcp
   vercel  https://mcp.vercel.com
@@ -447,7 +441,7 @@ claude_setup() {
     claude mcp add -s user -t http "$name" "$url" >/dev/null || warn "claude mcp add failed: $name"
   done
   # Claude plugins: marketplace (git URL pinned with #ref) + plugin@marketplace.
-  # caveman: always-on via SessionStart hook (OpenCode uses opencode-caveman).
+  # caveman: always-on via SessionStart hook.
   # capture first: grep -q + pipefail would SIGPIPE the producer
   local market ref plugin markets plugins
   markets="$(claude plugin marketplace list 2>/dev/null || true)"
@@ -462,68 +456,10 @@ claude_setup() {
     claude plugin install "$plugin@$market" >/dev/null || warn "plugin install failed: $plugin@$market"
   done
   claude_deny_rules
-  # RTK hook in ~/.claude/settings.json (OpenCode gets plugins/rtk.ts instead)
+  # RTK hook in ~/.claude/settings.json
   if command -v rtk >/dev/null 2>&1 && ! grep -q '^\[ok\] Hook' <<<"$(rtk init --show 2>/dev/null || true)"; then
     log "rtk hook (claude)"
     rtk init -g --hook-only --auto-patch >/dev/null || warn "rtk init failed"
-  fi
-}
-
-relink_opencode_skills() {
-  mkdir -p "$OPENCODE_SKILLS_DIR" "$AGENTS_SKILLS_DIR"
-  # remove managed links / empty; keep unknown non-links only with --force wipe of links
-  local f
-  for f in "$OPENCODE_SKILLS_DIR"/*(N); do
-    [[ -e "$f" || -L "$f" ]] || continue
-    if [[ -L "$f" ]]; then
-      rm -f "$f"
-    elif (( FORCE )); then
-      rm -rf "$f"
-    else
-      warn "skip non-link in opencode skills: $f"
-    fi
-  done
-  local s name
-  # -/ follows symlinks (custom skills are links into the repo)
-  for s in "$AGENTS_SKILLS_DIR"/*(N-/); do
-    name="${s:t}"
-    ln -sfn "$s" "$OPENCODE_SKILLS_DIR/$name"
-  done
-  log "opencode skills linked ($(ls -1 "$OPENCODE_SKILLS_DIR" | wc -l | tr -d ' '))"
-}
-
-# pnpm/plugin install can replace stowed files with plain files — package wins
-repair_opencode_stow() {
-  local pkg_dir="$REPO/opencode"
-  [[ -d "$pkg_dir" ]] || return 0
-  log "repair opencode stow"
-  local f rel dest
-  while IFS= read -r -d '' f; do
-    rel="${f#$pkg_dir/}"
-    dest="$HOME_DIR/$rel"
-    [[ -e "$dest" || -L "$dest" ]] || continue
-    if is_repo_link "$dest"; then
-      continue
-    fi
-    if [[ -L "$dest" ]]; then
-      local abs="${dest:A}"
-      [[ "$abs" == "$REPO"/* || "$abs" == "$f" ]] && continue
-    fi
-    log "remove stomped $dest"
-    rm -rf "$dest"
-  done < <(find "$pkg_dir" -type f -print0)
-  stow -d "$REPO" -t "$HOME_DIR" -R opencode
-}
-
-opencode_pnpm() {
-  [[ -f "$OPENCODE_DIR/package.json" ]] || return 0
-  if command -v pnpm >/dev/null 2>&1; then
-    log "pnpm install (opencode config)"
-    # optional native builds (msgpackr-extract) may warn; never fail install
-    (cd "$OPENCODE_DIR" && pnpm install --ignore-scripts >/dev/null) || true
-    repair_opencode_stow
-  else
-    warn "pnpm not found; skip opencode plugin install"
   fi
 }
 
@@ -567,13 +503,11 @@ if (( ! SKILLS_ONLY )); then
   done
   load_launch_agents
   check_secrets
-  opencode_pnpm
   claude_setup
 fi
 
 install_skills_external
 link_custom_skills
-relink_opencode_skills
 relink_claude_skills
 
 log "done"

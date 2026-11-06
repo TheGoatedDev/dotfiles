@@ -5,7 +5,6 @@ stow:
   - zsh
   - git
   - ghostty
-  - opencode
   - tmux
   - claude
   - launchd
@@ -24,15 +23,12 @@ tmux_plugins:
     - https://github.com/catppuccin/tmux
 
 skills:
-  agent: opencode
+  agent: claude-code
   custom_dir: skills/custom
   agents_dir: ~/.agents/skills
-  opencode_skills_dir: ~/.config/opencode/skills
   claude_skills_dir: ~/.claude/skills
   # skills.sh packages (source → skill names). Edit here; ./install --skills-only
   packages:
-    JuliusBrussee/caveman:
-      - caveman
     mattpocock/skills:
       - grilling
       - grill-with-docs
@@ -60,6 +56,3 @@ brewfile: Brewfile
 secrets:
   path: ~/.config/secrets/env
   example: env.example
-
-opencode:
-  dir: ~/.config/opencode

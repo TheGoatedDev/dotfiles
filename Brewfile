@@ -26,7 +26,6 @@ brew "stow"
 brew "tmux"
 brew "typescript-language-server"
 brew "zoxide"
-brew "anomalyco/tap/opencode", trusted: true
 brew "oven-sh/bun/bun"
 
 # Casks (dev-critical only; other apps stay installed but untracked)
