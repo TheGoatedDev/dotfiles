@@ -75,7 +75,7 @@ Skills are not stowed as trees: install rebuilds `~/.claude/skills/*` → `~/.ag
 Rough order (full install):
 
 1. Ensure Homebrew; `brew bundle --file=Brewfile --no-upgrade`
-2. Ensure `stow`; clone/update zsh plugins under `~/.zsh/plugins` and tmux plugins under `~/.config/tmux/plugins`
+2. Ensure `stow`; clone/update zsh plugins under `~/.zsh/plugins`, tmux plugins under `~/.config/tmux/plugins`, FreeCAD addons (`FREECAD_ADDON_REPOS`) into FreeCAD's `Mod` dir
 3. Stow each package in `manifest.yaml`
 4. Warn/check secrets file
 5. Register Claude plugins (incl. their MCP servers); deny rules; RTK Claude hook (`rtk init -g --hook-only`)
