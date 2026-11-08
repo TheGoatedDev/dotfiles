@@ -60,6 +60,13 @@ TMUX_PLUGIN_REPOS=(
   https://github.com/tmux-plugins/tmux-sensible
   https://github.com/catppuccin/tmux
 )
+FREECAD_MOD_DIR="$(expand_path "~/Library/Application Support/FreeCAD/v1-1/Mod")"
+# FreeCAD addons, cloned instead of via Addon Manager so they are tracked here.
+FREECAD_ADDON_REPOS=(
+  https://github.com/shaise/FreeCAD_FastenersWB
+  https://github.com/APEbbers/FreeCAD-Ribbon
+  https://github.com/obelisk79/FreeCAD-Nxt
+)
 MANIFEST="$REPO/manifest.yaml"
 CUSTOM_SKILLS_DIR="$REPO/skills/custom"
 AGENTS_SKILLS_DIR="$(expand_path ~/.agents/skills)"
@@ -263,6 +270,10 @@ clone_zsh_plugins() {
 
 clone_tmux_plugins() {
   clone_git_repos "$TMUX_PLUGINS_DIR" "${TMUX_PLUGIN_REPOS[@]}"
+}
+
+clone_freecad_addons() {
+  clone_git_repos "$FREECAD_MOD_DIR" "${FREECAD_ADDON_REPOS[@]}"
 }
 
 check_secrets() {
@@ -497,6 +508,7 @@ if (( ! SKILLS_ONLY )); then
   ensure_stow
   clone_zsh_plugins
   clone_tmux_plugins
+  clone_freecad_addons
   for pkg in "${STOW_PACKAGES[@]}"; do
     stow_package "$pkg"
   done
