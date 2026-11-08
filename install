@@ -66,6 +66,7 @@ FREECAD_ADDON_REPOS=(
   https://github.com/shaise/FreeCAD_FastenersWB
   https://github.com/APEbbers/FreeCAD-Ribbon
   https://github.com/obelisk79/FreeCAD-Nxt
+  https://github.com/obelisk79/OpenTheme
   https://github.com/CREATeNG/freecad-mcp-bridge#release
 )
 MANIFEST="$REPO/manifest.yaml"
