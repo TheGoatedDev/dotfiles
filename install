@@ -66,6 +66,7 @@ FREECAD_ADDON_REPOS=(
   https://github.com/shaise/FreeCAD_FastenersWB
   https://github.com/obelisk79/FreeCAD-Nxt
   https://github.com/obelisk79/OpenTheme
+  https://github.com/CREATeNG/freecad-mcp-bridge#release
 )
 MANIFEST="$REPO/manifest.yaml"
 CUSTOM_SKILLS_DIR="$REPO/skills/custom"
@@ -249,8 +250,11 @@ clone_git_repos() {
   local dest_dir="$1"
   shift
   mkdir -p "$dest_dir"
-  local url name dest
+  local url ref name dest
   for url in "$@"; do
+    # url#branch clones that branch instead of the default
+    ref="${url#*\#}"; [[ "$ref" == "$url" ]] && ref=""
+    url="${url%%\#*}"
     name="${url:t}"
     name="${name%.git}"
     dest="$dest_dir/$name"
@@ -259,7 +263,7 @@ clone_git_repos() {
       git -C "$dest" pull --ff-only --quiet || warn "could not update $name"
     else
       log "clone plugin $name"
-      git clone --depth 1 "$url" "$dest"
+      git clone --depth 1 ${ref:+--branch=$ref} "$url" "$dest"
     fi
   done
 }
@@ -476,6 +480,11 @@ claude_setup() {
   if ! claude mcp get rea >/dev/null 2>&1; then
     log "claude mcp add rea"
     claude mcp add -s user rea -- npx -y rea-agents@6.8.0 mcp >/dev/null || warn "claude mcp add failed: rea"
+  fi
+  # FreeCAD MCP Bridge addon: loopback only, listens only while toggled on in FreeCAD.
+  if ! claude mcp get freecad >/dev/null 2>&1; then
+    log "claude mcp add freecad"
+    claude mcp add -s user -t http freecad http://127.0.0.1:39280/mcp >/dev/null || warn "claude mcp add failed: freecad"
   fi
   claude_deny_rules
   # RTK hook in ~/.claude/settings.json
