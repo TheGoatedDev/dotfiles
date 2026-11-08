@@ -280,6 +280,18 @@ clone_freecad_addons() {
   clone_git_repos "$FREECAD_MOD_DIR" "${FREECAD_ADDON_REPOS[@]}"
 }
 
+apply_freecad_prefs() {
+  local cmd=/Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd
+  [[ -x "$cmd" ]] || return 0
+  # A running GUI rewrites user.cfg from memory on quit, dropping these.
+  if pgrep -qf "FreeCAD.app/Contents/Resources/bin/freecad$"; then
+    warn "FreeCAD running; skip Onshape keymap (quit it and rerun, or exec freecad/onshape.py in its Python console)"
+    return 0
+  fi
+  log "FreeCAD Onshape keymap"
+  "$cmd" "$REPO/freecad/onshape.py" >/dev/null || warn "FreeCAD prefs failed"
+}
+
 check_secrets() {
   if [[ -f "$SECRETS_PATH" ]]; then
     log "secrets ok ($SECRETS_PATH)"
@@ -518,6 +530,7 @@ if (( ! SKILLS_ONLY )); then
   clone_zsh_plugins
   clone_tmux_plugins
   clone_freecad_addons
+  apply_freecad_prefs
   for pkg in "${STOW_PACKAGES[@]}"; do
     stow_package "$pkg"
   done

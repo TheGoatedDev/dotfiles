@@ -25,6 +25,7 @@ this repo  →  ./install  →  $HOME (stow links, brew, skills)
 | `manifest.yaml` | Stow packages + [skills.sh](https://skills.sh) package list (`skills.packages`). |
 | `Brewfile` | Canonical Homebrew formulae/casks/vscode extensions to **ensure**. Does not uninstall extras on the machine. |
 | `zsh/`, `git/`, `ghostty/`, `tmux/`, `claude/`, `launchd/` | Stow packages → `$HOME` (mirror home-relative paths). |
+| `freecad/onshape.py` | Onshape mouse (TinkerCAD nav) + keys, written to FreeCAD `user.cfg` by install (not stowed; FreeCAD rewrites it). |
 | `skills/custom/` | First-party skills; install symlinks into `~/.agents/skills/`. |
 | `env.example` | Template → `~/.config/secrets/env` (chmod 600). |
 | `gitconfig.local.example` | Template → `~/.gitconfig.local` (name/email/signing). |
@@ -75,7 +76,7 @@ Skills are not stowed as trees: install rebuilds `~/.claude/skills/*` → `~/.ag
 Rough order (full install):
 
 1. Ensure Homebrew; `brew bundle --file=Brewfile --no-upgrade`
-2. Ensure `stow`; clone/update zsh plugins under `~/.zsh/plugins`, tmux plugins under `~/.config/tmux/plugins`, FreeCAD addons (`FREECAD_ADDON_REPOS`) into FreeCAD's `Mod` dir
+2. Ensure `stow`; clone/update zsh plugins under `~/.zsh/plugins`, tmux plugins under `~/.config/tmux/plugins`, FreeCAD addons (`FREECAD_ADDON_REPOS`) into FreeCAD's `Mod` dir; Onshape keymap `freecad/onshape.py` via `freecadcmd` (skipped while FreeCAD runs)
 3. Stow each package in `manifest.yaml`
 4. Warn/check secrets file
 5. Register Claude plugins (incl. their MCP servers); deny rules; RTK Claude hook (`rtk init -g --hook-only`)
