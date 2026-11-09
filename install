@@ -64,7 +64,7 @@ FREECAD_MOD_DIR="$(expand_path "~/Library/Application Support/FreeCAD/v1-1/Mod")
 # FreeCAD addons, cloned instead of via Addon Manager so they are tracked here.
 FREECAD_ADDON_REPOS=(
   https://github.com/shaise/FreeCAD_FastenersWB
-  https://github.com/obelisk79/FreeCAD-Nxt
+  https://github.com/APEbbers/FreeCAD-Ribbon
   https://github.com/obelisk79/OpenTheme
   https://github.com/CREATeNG/freecad-mcp-bridge#release
 )
