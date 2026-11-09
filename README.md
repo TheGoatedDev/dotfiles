@@ -63,6 +63,6 @@ Never commit real keys. Only `env.example` is tracked. Live file: `~/.config/sec
 
 ## Claude Code
 
-`~/.claude/CLAUDE.md` is stowed (skill index + policy). `./install` installs Claude plugins (posthog brings its MCP server); `settings.json` is not stowed.
+`~/.claude/CLAUDE.md` is stowed (skill index + policy). `./install` installs Claude plugins (posthog, linear bring their MCP servers); `settings.json` is not stowed.
 
 Library docs: `find-docs` skill (`ctx7` CLI). Discover more skills: `find-skills`.

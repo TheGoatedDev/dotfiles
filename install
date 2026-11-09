@@ -423,6 +423,7 @@ CLAUDE_PLUGINS=(
   # rea: tags lack .claude-plugin/ and #ref can't be a SHA; main's marketplace.json pins npm rea-agents
   rea 'https://github.com/morluto/rea.git' rea
   claude-plugins-official anthropics/claude-plugins-official posthog
+  claude-plugins-official anthropics/claude-plugins-official linear
 )
 
 # Plugin parts to hide (Claude can't disable single plugin components).
