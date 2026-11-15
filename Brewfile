@@ -30,7 +30,7 @@ brew "zoxide"
 brew "oven-sh/bun/bun"
 
 # Casks (dev-critical only; other apps stay installed but untracked)
-cask "claude-code"
+cask "claude-code@latest"
 cask "cyberduck"
 cask "docker-desktop"
 cask "freecad"
