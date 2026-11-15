@@ -1,4 +1,3 @@
-tap "anomalyco/tap"
 tap "oven-sh/bun", trusted: true
 
 # CLI / dev
