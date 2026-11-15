@@ -35,7 +35,7 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 ## Platforms
 
 - `posthog:*` — PostHog analytics, flags, experiments, errors (Claude plugin `posthog@claude-plugins-official`; bundles PostHog MCP)
-- `linear-workflow` — Linear issues: team, Type labels, priority, templates, statuses (uses Linear plugin MCP)
+- `linear-workflow` — Linear issues: grill first, vertical slices, per-type templates, labels, statuses (uses Linear plugin MCP)
 
 ## Reverse engineering / automation
 

@@ -9,10 +9,45 @@ Team: **Personal** (key `TGD`). Pass `team: "Personal"` when creating.
 
 ## Before creating
 
-- Search first with `list_issues` (`query`, `team: "Personal"`). Do not create duplicates. If one exists, update it or mark the new one Duplicate.
-- Grill before writing. Load the `grilling` skill and interview the user in rounds until the design tree is empty: scope, behavior, edge cases, failure modes, dependencies, done-ness. Look up facts (code, existing issues, docs) yourself. Skip only when the user says "quick ticket" or "no grill".
-- Pick the template: new behavior → `User Story`. Something broken → `Bug`. Pass it as `template` on `save_issue` and fill its sections, then append the sections from "Expanded body" below.
-- Chore, Spike and Improvement have no template. Use the "Expanded body" sections alone.
+1. Search first with `list_issues` (`query`, `team: "Personal"`). Do not create duplicates. If one exists, update it or mark the new one Duplicate.
+2. Grill. Load the `grilling` skill and interview the user in rounds. Look up facts (code, existing issues, docs) yourself.
+   - Feature, Bug, Improvement: up to 3 rounds. Continue past 3 only if the user says "keep going".
+   - Chore, Spike: 1 round.
+   - Skip when the user says "quick ticket" or "no grill".
+   - Anything still unresolved goes in Open questions.
+3. Check the slice (see "Vertical slices"). Propose a split if needed.
+4. Show the full draft, or the split plan, to the user. Create nothing until they confirm.
+5. Create with the template for the type (see "Templates").
+
+Every decision from the grill goes in the Decisions section with its reason and rejected options. Do not post the Q&A transcript as a comment.
+
+## Templates
+
+Source of truth: `templates/*.md` next to this file. The Linear workspace templates are copies the user pastes in. When they differ, follow the repo file and tell the user.
+
+| Type label | Linear template | File |
+|------------|-----------------|------|
+| `Feature` | `User Story` | `templates/user-story.md` |
+| `Bug` | `Bug` | `templates/bug.md` |
+| `Improvement` | `Improvement` | `templates/improvement.md` |
+| `Chore` | `Chore` | `templates/chore.md` |
+| `Spike` | `Spike` | `templates/spike.md` |
+
+- Pass the template name as `template` on `save_issue` and fill every section. If the Linear template does not exist yet, use the repo file as the description and set the label with `addLabels`.
+- Keep section order and headings. Do not invent other layouts.
+- Write "None." in Open questions rather than deleting it. Drop another section only when it is truly empty.
+
+## Vertical slices
+
+- Every Feature, Improvement and Bug must be a vertical slice: a working change through every layer it touches (UI, API, data), demoable and shippable alone.
+- Never write layer-only tickets ("add DB column", "build endpoint").
+- Chores and Spikes are exempt. When one unblocks a slice, link it with a `blocks` relation. Pure maintenance needs no link.
+- Propose a split when there are more than about 6 acceptance criteria, or when parts could ship on their own. Never split without the user's OK.
+- Split shape: a parent issue keeps the story, Context and shared Decisions; each slice is a sub-issue (`parentId`) with its own template body. Use a project only when the work spans several parent issues or several weeks.
+
+## Expanding an existing issue
+
+When asked to expand an issue (e.g. "expand TGD-12"): read it with `get_issue` and `list_comments`, grill on the gaps against its type's template, show the draft, then update with `patch`. Keep facts already in the body.
 
 ## Labels
 
@@ -20,8 +55,8 @@ Exactly one label from the single-select **Type** group on every issue:
 
 | Label | Use for |
 |-------|---------|
-| `Feature` | New capability (User Story template) |
-| `Bug` | Broken behavior (Bug template) |
+| `Feature` | New capability |
+| `Bug` | Broken behavior |
 | `Improvement` | Change to existing behavior |
 | `Chore` | Maintenance, refactor, cleanup, deps |
 | `Spike` | Time-boxed research or investigation |
@@ -45,19 +80,6 @@ Backlog → Todo → In Progress → In Review → Ready for Release → Done. O
 - New issues go to Backlog unless the user says otherwise.
 - Move to In Progress when work starts, In Review when a PR is open.
 - An archived issue cannot be modified. Ask before unarchiving.
-
-## Expanded body
-
-Every resolved branch of the grill goes in the ticket. Nothing the user decided stays only in chat. Add these sections after any template sections; drop one only when it is truly empty, and say "None" rather than omit Open questions.
-
-- **Context**: the problem, who hits it, why now. Link related issues.
-- **Goal**: one or two sentences on the outcome.
-- **Scope** and **Out of scope**: explicit lists. Every "not now" from the grill goes in Out of scope.
-- **Decisions**: each settled question, the choice, the reason, and the rejected options.
-- **Behavior and edge cases**: inputs, states, empty/error/limit cases, what happens in each.
-- **Risks and dependencies**: what could break, what this waits on. Real blockers also get a `blockedBy` relation.
-- **Acceptance criteria**: checklist, one testable item per behavior and edge case above.
-- **Open questions**: anything unresolved, or "None".
 
 ## Writing issues
 
