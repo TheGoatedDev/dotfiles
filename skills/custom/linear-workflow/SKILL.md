@@ -10,8 +10,9 @@ Team: **Personal** (key `TGD`). Pass `team: "Personal"` when creating.
 ## Before creating
 
 - Search first with `list_issues` (`query`, `team: "Personal"`). Do not create duplicates. If one exists, update it or mark the new one Duplicate.
-- Pick the template: new behavior → `User Story`. Something broken → `Bug`. Pass it as `template` on `save_issue`. Pass an empty `description` to keep the template body, or fill the template sections. Do not invent other section layouts.
-- Chore, Spike and Improvement have no template. Write a short description with Context and Acceptance criteria.
+- Grill before writing. Load the `grilling` skill and interview the user in rounds until the design tree is empty: scope, behavior, edge cases, failure modes, dependencies, done-ness. Look up facts (code, existing issues, docs) yourself. Skip only when the user says "quick ticket" or "no grill".
+- Pick the template: new behavior → `User Story`. Something broken → `Bug`. Pass it as `template` on `save_issue` and fill its sections, then append the sections from "Expanded body" below.
+- Chore, Spike and Improvement have no template. Use the "Expanded body" sections alone.
 
 ## Labels
 
@@ -44,6 +45,19 @@ Backlog → Todo → In Progress → In Review → Ready for Release → Done. O
 - New issues go to Backlog unless the user says otherwise.
 - Move to In Progress when work starts, In Review when a PR is open.
 - An archived issue cannot be modified. Ask before unarchiving.
+
+## Expanded body
+
+Every resolved branch of the grill goes in the ticket. Nothing the user decided stays only in chat. Add these sections after any template sections; drop one only when it is truly empty, and say "None" rather than omit Open questions.
+
+- **Context**: the problem, who hits it, why now. Link related issues.
+- **Goal**: one or two sentences on the outcome.
+- **Scope** and **Out of scope**: explicit lists. Every "not now" from the grill goes in Out of scope.
+- **Decisions**: each settled question, the choice, the reason, and the rejected options.
+- **Behavior and edge cases**: inputs, states, empty/error/limit cases, what happens in each.
+- **Risks and dependencies**: what could break, what this waits on. Real blockers also get a `blockedBy` relation.
+- **Acceptance criteria**: checklist, one testable item per behavior and edge case above.
+- **Open questions**: anything unresolved, or "None".
 
 ## Writing issues
 
