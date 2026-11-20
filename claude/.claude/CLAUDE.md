@@ -23,7 +23,7 @@ Source of truth for what should be installed: Dotfiles `manifest.yaml` `skills.p
 
 ## JS / tooling
 
-- `tech-stack` — default stack for new apps/deps (TanStack Start, Postgres+Drizzle, Better Auth, Hono)
+- `tech-stack` — default TS stack for new apps/deps (TanStack Start, Hono, Postgres+Drizzle, Better Auth, Expo, OTel)
 - `pnpm` — pnpm workspaces, catalogs, filters, CLI usage
 - `turborepo` — Turborepo tasks, caching, monorepo config
 - `shadcn` — add, search, compose shadcn/ui components and registries
